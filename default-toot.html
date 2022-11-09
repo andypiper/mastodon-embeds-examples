@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- using the default iframe code from Mastodon -->
+  <head>
+    <meta charset="utf-8" />
+    <title>a simple Toot</title>
+    <meta name="author" content="@andypiper@mastodon.social" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="mastodon, embed toot" />
+    <meta name="description" content="Example Mastodon embeds" />
+    <link rel="stylesheet" href="css/basic.css" />
+  </head>
+
+  <body>
+    <div>
+      You can quickly grab embed code for any toot, by choosing the Embed option from the [...] menu on the Mastodon web interface underneath the toot.<br/><br/></div>
+    <div>
+      Alternatively, you can use the oEmbed API to get the same iFrame code directly. For example, the embed below could be retrieved using<br/> <br/>
+      <code>curl "https://mastodon.social/api/oembed?url=https://mastodon.social/@andypiper/108237453365199182"</code><br/><br/>
+      The HTML is in the <code>html</code> property in the JSON reponse.
+      
+    <pre>
+{
+  "type": "rich",
+  "version": "1.0",
+  "author_name": "Andy Piper",
+  "author_url": "https://mastodon.social/@andypiper",
+  "provider_name": "mastodon.social",
+  "provider_url": "https://mastodon.social/",
+  "cache_age": 86400,
+  "html":"\u003ciframe src=\"https://mastodon.social/@andypiper/108237453365199182/embed\" class=\"mastodon-embed\" style=\"max-width: 100%; border: 0\" width=\"400\" allowfullscreen=\"allowfullscreen\"\u003e\u003c/iframe\u003e\u003cscript src=\"https://static-cdn.mastodon.social/embed.js\" async=\"async\"\u003e\u003c/script\u003e"
+  "width": 400,
+  "height": null
+}
+</pre>
+    </div>
+      
+    <div>
+      This is what that looks like when rendered.
+    </div>
+    <div>
+      <iframe src="https://mastodon.social/@andypiper/108237453365199182/embed" class="mastodon-embed" style="max-width: 100%; border: 0" width="400" allowfullscreen="allowfullscreen"></iframe><script src="https://static-cdn.mastodon.social/embed.js" async="async"></script>
+    </div>
+  </body>
+</html>

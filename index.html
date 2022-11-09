@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Testing Mastodon embeds</title>
+    <meta name="author" content="@andypiper@mastodon.social" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="mastodon, embed timeline" />
+    <meta name="description" content="Example Mastodon embeds" />
+    <link rel="stylesheet" href="css/basic.css" />
+  </head>
+
+  <body>
+    <div>
+      This is a simple project to try out embedding content from the Fediverse
+      (in this case, currently only Mastodon) using different tools and
+      methods.<br /><br />
+
+      Toots are straightforward to embed (Mastodon's API supports <a href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a>, and has an
+      embed code option on the web UI), timelines
+      <a href="https://github.com/mastodon/mastodon/issues/6094"
+        >need a bit more work</a
+      >.
+    </div>
+    <div>
+      <ul>
+        <li>Using Mastofeed - <a href="./mastofeed.html">example</a></li>
+        <li>
+          Using mastodon-embed-feed-timeline - <a href="./meft.html">example</a>
+        </li>
+        <li>
+          A single Toot using the default option on Mastodon -
+          <a href="./default-toot.html">example</a>
+        </li>
+        <li>
+          A single unformatted Toot pulled from the Mastodon API -
+          <a href="./single-toot-api.html">example</a>
+        </li>
+      </ul>
+      Also, there's a
+      <a href="https://github.com/grayleonard/mastodon-share"
+        >Fediverse sharing button</a
+      >
+      on some of the pages. <br />&nbsp;<br />
+    </div>
+    <div>Learn more and read the code by boopsing on the fishies!</div>
+    <div>
+      <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"
+        ><img
+          src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
+          alt="Remix on Glitch"
+      /></a>
+    </div>
+  </body>
+</html>
