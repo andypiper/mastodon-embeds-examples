@@ -13,5 +13,6 @@ Toots are straightforward to embed (Mastodon supports oEmbed, and has an embed c
 - https://gitlab.com/idotj/mastodon-embed-feed-timeline
 - https://github.com/grayleonard/mastodon-share
 - https://toot.kytta.dev/
+- https://maplefeed.bihlink.com/
 
 [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg)](https://glitch.com/edit/#!/remix/mastodon-embeds)
