@@ -175,3 +175,8 @@ h2 {
 .dipped {
   transform: translateY(5px);
 }
+
+div.info-block {
+  padding: 1rem;
+  border-radius: 2px;
+}

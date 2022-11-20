@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Testing Mastodon embedded timeline</title>
-    <meta name="author" content="@andypiper@mastodon.social" />
+    <meta name="author" content="@andypiper@macaw.social" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="keywords" content="mastodon, embed timeline" />
     <meta name="description" content="Mastodon embed timeline" />
@@ -13,6 +13,9 @@
   </head>
 
   <body>
+      <div class="info-block">
+      The timeline embedded here is using <a href="https://mastofeed.com/">Mastofeed</a>, with options set to dark mode, show the profile header, include replies, but not to include boosts.
+    </div>
     <div class="fedi-share fedi-share-lg">
       <input type="checkbox" class="fedi-check-toggle" />
       <div class="fedi-instance">
@@ -36,7 +39,7 @@
         sandbox="allow-top-navigation allow-scripts"
         width="400"
         height="800"
-        src="https://www.mastofeed.com/apiv2/feed?userurl=https%3A%2F%2Fmastodon.social%2Fusers%2Fandypiper&theme=dark&size=100&header=true&replies=false&boosts=false"
+        src="https://www.mastofeed.com/apiv2/feed?userurl=https%3A%2F%2Fmacaw.social%2Fusers%2Fandypiper&theme=dark&size=100&header=true&replies=true&boosts=false"
       ></iframe>
     </div>
 
