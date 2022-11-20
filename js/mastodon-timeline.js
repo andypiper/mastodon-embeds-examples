@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let mapi = new MastodonApi({
     container_id: "mt-timeline",
     container_body_id: "mt-body",
-    instance_uri: "https://mastodon.social",
-    user_id: "7201",
+    instance_uri: "https://macaw.social",
+    user_id: "109332977621728450",
     profile_name: "@andypiper",
     toots_limit: 5,
     btn_see_more: "See more posts at Mastodon",
