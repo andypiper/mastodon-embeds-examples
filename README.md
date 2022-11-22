@@ -6,6 +6,10 @@ Trying out various means to embed Mastodon Toots and Timelines (and combinations
 
 Toots are straightforward to embed (Mastodon supports oEmbed, and has an embed code option on the web UI), timelines [need a bit more work](https://github.com/mastodon/mastodon/issues/6094).
 
+## More information
+
+[I wrote about this on DEV](https://dev.to/andypiper/a-opportunity-for-developers-1ee4)
+
 ## Useful links
 
 - https://github.com/Uden-AI/fediverse-share
