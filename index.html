@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  <!-- this HTML markup is really quick and dirty, to be improved -->
   <head>
     <meta charset="utf-8" />
     <title>Testing Fediverse embeds</title>
@@ -29,7 +30,10 @@
       />
     </figure>
     <div>
-      This is a simple project for testing embeds of content from the Fediverse (in this case, currently Mastodon and Pixelfed) using different tools and methods.<br /><br />
+      This is a simple project for testing embeds of content from
+      <em><a href="https://joinfediverse.wiki/">the Fediverse</a></em> (in this
+      case, currently Mastodon and Pixelfed) using different tools and
+      methods.<br /><br />
 
       📝
       <a href="https://dev.to/andypiper/a-opportunity-for-developers-1ee4"
@@ -94,39 +98,51 @@
         >
         is similar to Mastodon v1; it does not offer an oEmbed endpoint (that I
         have found).
-      </div>
-      <ul>
-        <li>
-          A single post using the default embed option from Pixelfed -
-          <a href="./default-pixelfed.html">example</a>
-        </li>
-      </ul>
 
-      I've included a
-      <a href="https://github.com/Uden-AI/fediverse-share"
-        >Fediverse sharing button</a
-      >
-      on some of the pages. <br />&nbsp;<br />
-    </div>
-    <div>
-      Learn more and read the code that does this by boopsing on the fishies below! ⤵️ or, look
-      at <a href="https://github.com/andypiper/mastodon-embeds-examples">the GitHub project</a> (the same code, but needs to be deployed to a web server).<br />&nbsp;<br />
-    </div>
-    <div>
-      <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"
-        ><img
-          src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
-          alt="Remix on Glitch"
-      /></a>
-    </div>
-    <div>
+        <ul>
+          <li>
+            A single post using the default embed option from Pixelfed -
+            <a href="./default-pixelfed.html">example</a>
+          </li>
+        </ul>
+
+        Pixelfed has Atom feeds for user timelines (not RSS) - they are at
+        <code>[instance]/users/[username].atom</code>
+      </div>
       <br />
-      I live at
-      <a href="https://macaw.social/@andypiper">@andypiper@macaw.social</a> and
-      <a href="https://pixelfed.social/@andypiper"
-        >@andypiper@pixelfed.social</a
-      >
-      if you want to say hello! 👋🏻
+
+      <div>
+        I've included a
+        <a href="https://github.com/Uden-AI/fediverse-share"
+          >Fediverse sharing button</a
+        >
+        on some of the pages. <br />&nbsp;<br />
+      </div>
+      <div>
+        Learn more and read the code that does this by boopsing on the fishies
+        below! ⤵️ or, look at
+        <a href="https://github.com/andypiper/mastodon-embeds-examples"
+          >the GitHub project</a
+        >
+        (the same code, but needs to be deployed to a web server).<br />&nbsp;<br />
+      </div>
+      <div>
+        <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"
+          ><img
+            src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
+            alt="Remix on Glitch"
+        /></a>
+      </div>
+      <div>
+        <br />
+        I live at
+        <a href="https://macaw.social/@andypiper">@andypiper@macaw.social</a>
+        and
+        <a href="https://pixelfed.social/@andypiper"
+          >@andypiper@pixelfed.social</a
+        >
+        if you want to say hello! 👋🏻
+      </div>
     </div>
   </body>
 </html>
