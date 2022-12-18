@@ -1,6 +1,6 @@
 - [ ] more examples
   - Pixelfed (WIP)
-  - Pleroma
+  - Pleroma (fedifeed does this and Misskey)
   - WriteFreely
 - [ ] use Bulma with info boxes etc
 - [ ] more descriptions for config options
