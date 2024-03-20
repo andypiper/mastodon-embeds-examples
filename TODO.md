@@ -11,3 +11,7 @@
 - [ ] atom feeds
 
 - [ ] links to icons e.g. Mastodon, Pixelfed, Fediverse logos
+
+## Examples to add
+
+- https://github.com/justinribeiro/share-to-mastodon
