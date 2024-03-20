@@ -1,8 +1,8 @@
 # Examples of Mastodon embeds
 
-![mastodon-embeds-examples](https://socialify.git.ci/andypiper/mastodon-embeds-examples/image?description=1&font=Bitter&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fandypiper%2Fmastodon-embeds-examples%2Fff381187771674005e7be76426a5f6034c395b11%2Fmastodon-logo.svg&name=1&owner=1&pattern=Floating%20Cogs&theme=Light)
+![mastodon-embeds-examples](https://socialify.git.ci/andypiper/mastodon-embeds-examples/image?description=1&descriptionEditable=Examples%20of%20embedding%20Mastodon%20timelines%20%26%20posts%20in%20HTML&font=Bitter&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fandypiper%2Fmastodon-embeds-examples%2Fglitch%2Fmastodon-logo.svg&name=1&owner=1&pattern=Floating%20Cogs&theme=Auto)
 
-Trying out various means to embed Fediverse content - Mastodon Toots and Timelines (and combinations of other things, API, buttons, etc), images from Pixelfed, more to come.
+Trying out various means to embed Fediverse content - Mastodon posts and timelines (and combinations of other things, API, buttons, etc), images from Pixelfed, more to come.
 
 Toots are straightforward to embed (Mastodon supports oEmbed, and has an embed code option on the web UI), timelines [need a bit more work](https://github.com/mastodon/mastodon/issues/6094).
 
