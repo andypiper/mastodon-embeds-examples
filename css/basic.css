@@ -8,10 +8,34 @@ html {
   font-family: sans-serif;
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 1em 0 1em;
 }
 
-p,ul,ol {
+p,
+ul,
+ol {
   margin-bottom: 2em;
+}
+
+body {
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode {
+  background-color: #212529;
+  color: #f8f9fa;
+}
+
+.dark-mode a {
+  color: #adb5bd;
+}
+
+.dark-mode a:hover {
+  color: #f8f9fa;
 }

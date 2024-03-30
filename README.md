@@ -15,7 +15,7 @@ Toots are straightforward to embed (Mastodon supports oEmbed, and has an embed c
 - https://github.com/Uden-AI/fediverse-share
 - https://mastofeed.com
 - https://github.com/SamTherapy/fedifeed (fork of mastofeed)
-- https://gitlab.com/idotj/mastodon-embed-feed-timeline
+- https://gitlab.com/idotj/mastodon-embed-timeline
 - https://github.com/grayleonard/mastodon-share
 - https://toot.kytta.dev/
 - https://maplefeed.bihlink.com/
