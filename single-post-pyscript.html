@@ -32,9 +32,26 @@
 
 
     <style>
-      .theme-toggle-button {
-        margin-bottom: 1.5rem;
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
       }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
 
       #mastodonpy-output {
         min-height: 100px;
@@ -267,10 +284,14 @@
 
   <body>
 
-    <section class="section">
-      <div class="container">
+    <section class="section has-top-controls">
 
-        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+    <button class="button theme-toggle-button" aria-label="Toggle theme">
+      <span class="icon theme-icon">
+      </span>
+    </button>
+
+      <div class="container">
 
         <h1 class="title">Mastodon Single Post Embed via PyScript + Mastodon.py</h1>
 
@@ -531,36 +552,63 @@ except Exception as e:
   </script>
 
 
-    <script>
-      (function () {
-        const toggleButton = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
-        const storageKey = 'theme-preference';
+<script>
+  (function () {
+    // Simple inline SVGs for icons
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
 
-        const applyTheme = (theme) => {
-          htmlElement.dataset.theme = theme;
-        };
+    // Select ALL buttons with this class
+    const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+    // Select ALL icon spans within those buttons
+    const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+    const htmlElement = document.documentElement;
+    const storageKey = 'theme-preference';
 
-        const getPreferredTheme = () => {
-          const savedTheme = localStorage.getItem(storageKey);
-          if (savedTheme) return savedTheme;
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        };
+    // Function to apply theme and update ALL icons
+    const applyTheme = (theme) => {
+      htmlElement.dataset.theme = theme;
+      const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+      iconSpans.forEach(span => {
+        // Check if span exists before setting innerHTML
+        if (span) span.innerHTML = iconHTML;
+      });
+    };
 
-        let currentTheme = getPreferredTheme();
-        applyTheme(currentTheme);
+    // Function to get the preferred theme
+    const getPreferredTheme = () => {
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) return savedTheme;
+      // Default to light if no system preference detected or needed
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
 
-        if (toggleButton) {
-          toggleButton.addEventListener('click', () => {
-            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            applyTheme(currentTheme);
-            localStorage.setItem(storageKey, currentTheme);
-          });
-        } else {
-          console.warn("Theme toggle button not found");
-        }
-      })();
-    </script>
+    // Function to handle the button click
+    const handleToggleClick = () => {
+      // Read the current theme directly from the html element
+      let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem(storageKey, newTheme);
+    }
+
+    // --- Initialization ---
+    // Apply the initial theme when the script runs
+    let currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    // Add listeners to all toggle buttons found
+    if (toggleButtons.length > 0) {
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', handleToggleClick);
+      });
+    } else {
+      // It's okay if not found on pages without the button
+      // console.warn("Theme toggle button(s) not found on this page.");
+    }
+  })();
+</script>
+
 
   </body>
 

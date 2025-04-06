@@ -9,8 +9,7 @@
 
     <meta name="author" content="@andypiper@macaw.social" />
     <meta name="keywords" content="mastodon, fediverse, example, oembed" />
-    <meta name="description"
-      content="Example showing how to embed a single Mastodon post using oEmbed" />
+    <meta name="description" content="Example showing how to embed a single Mastodon post using oEmbed" />
 
     <meta property="og:title" content="Mastodon Post Embed Example" />
     <meta property="og:type" content="website" />
@@ -25,8 +24,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
 
     <style>
+      .section.has-top-controls {
+        position: relative;
+        padding-top: 4rem;
+      }
+
       .theme-toggle-button {
-        margin-bottom: 1.5rem;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .theme-toggle-button .icon svg {
+        width: 1.1em;
+        height: 1.1em;
       }
     </style>
 
@@ -34,10 +52,13 @@
 
   <body>
 
-    <section class="section">
-      <div class="container">
+    <button class="button theme-toggle-button" aria-label="Toggle theme">
+      <span class="icon theme-icon">
+      </span>
+    </button>
 
-        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+    <section class="section has-top-controls">
+      <div class="container">
 
         <h1 class="title">Mastodon Single Post Embed</h1>
 
@@ -57,11 +78,14 @@
           <div class="content">
             <h2 class="title is-4">Using the oEmbed API</h2>
             <p>
-              Another method is to programmatically get the embed code directly via the <a href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a> API.
+              Another method is to programmatically get the embed code directly via the <a
+                href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a> API.
               For example, the embed below (from <code>macaw.social</code>, which is where my own account lives) could
               be retrieved using:
             </p>
-            <div style="padding-bottom: 1rem;"><code>curl "https://macaw.social/api/oembed?url=https://macaw.social/@andypiper/109349688112355529"</code></div>
+            <div style="padding-bottom: 1rem;">
+              <code>curl "https://macaw.social/api/oembed?url=https://macaw.social/@andypiper/109349688112355529"</code>
+            </div>
 
             <p>The API returns JSON data like this:</p>
             <pre><code>{
@@ -76,7 +100,8 @@
   "width": 400,
   "height": null
 }</code></pre>
-            <p>The actual HTML embed code is found as an escaped string within the <code>html</code> property in the JSON response.</p>
+            <p>The actual HTML embed code is found as an escaped string within the <code>html</code> property in the
+              JSON response.</p>
           </div>
         </div>
 
@@ -117,36 +142,63 @@
       </div>
     </footer>
 
-    <script>
-      (function () {
-        const toggleButton = document.getElementById('theme-toggle');
-        const htmlElement = document.documentElement;
-        const storageKey = 'theme-preference';
+<script>
+  (function () {
+    // Simple inline SVGs for icons
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
 
-        const applyTheme = (theme) => {
-          htmlElement.dataset.theme = theme;
-        };
+    // Select ALL buttons with this class
+    const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+    // Select ALL icon spans within those buttons
+    const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+    const htmlElement = document.documentElement;
+    const storageKey = 'theme-preference';
 
-        const getPreferredTheme = () => {
-          const savedTheme = localStorage.getItem(storageKey);
-          if (savedTheme) return savedTheme;
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        };
+    // Function to apply theme and update ALL icons
+    const applyTheme = (theme) => {
+      htmlElement.dataset.theme = theme;
+      const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+      iconSpans.forEach(span => {
+        // Check if span exists before setting innerHTML
+        if (span) span.innerHTML = iconHTML;
+      });
+    };
 
-        let currentTheme = getPreferredTheme();
-        applyTheme(currentTheme);
+    // Function to get the preferred theme
+    const getPreferredTheme = () => {
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) return savedTheme;
+      // Default to light if no system preference detected or needed
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
 
-        if (toggleButton) {
-          toggleButton.addEventListener('click', () => {
-            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            applyTheme(currentTheme);
-            localStorage.setItem(storageKey, currentTheme);
-          });
-        } else {
-          console.warn("Theme toggle button not found");
-        }
-      })();
-    </script>
+    // Function to handle the button click
+    const handleToggleClick = () => {
+      // Read the current theme directly from the html element
+      let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem(storageKey, newTheme);
+    }
+
+    // --- Initialization ---
+    // Apply the initial theme when the script runs
+    let currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    // Add listeners to all toggle buttons found
+    if (toggleButtons.length > 0) {
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', handleToggleClick);
+      });
+    } else {
+      // It's okay if not found on pages without the button
+      // console.warn("Theme toggle button(s) not found on this page.");
+    }
+  })();
+</script>
+
 
   </body>
 

@@ -25,9 +25,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
 
     <style>
-      .theme-toggle-button {
-        margin-bottom: 1.5rem;
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
       }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
 
       /* Style the iframe */
       .mastofeed-iframe {
@@ -44,10 +61,14 @@
 
   <body>
 
-    <section class="section">
-      <div class="container">
+    <section class="section has-top-controls">
 
-        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+      <button class="button theme-toggle-button" aria-label="Toggle theme">
+        <span class="icon theme-icon">
+        </span>
+      </button>
+
+      <div class="container">
 
         <h1 class="title">Mastodon Timeline Embed: Mastofeed</h1>
 
@@ -105,12 +126,18 @@
 
     <script>
       (function () {
-        const toggleButton = document.getElementById('theme-toggle');
+        // --- Elements ---
+        const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+        const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
         const htmlElement = document.documentElement;
         const mastofeedIframe = document.getElementById('mastofeed-iframe'); // Get iframe
-        const storageKey = 'theme-preference';
 
-        // Base URL parts for the iframe (modify userurl etc. as needed)
+        // --- Constants ---
+        const storageKey = 'theme-preference';
+        const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+        const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+        // --- Iframe Config ---
         const mastofeedBase = 'https://www.mastofeed.com/apiv2/feed';
         const mastofeedParams = {
           userurl: 'https://macaw.social/users/andypiper', // Needs encoding
@@ -121,57 +148,61 @@
           // theme will be added dynamically
         };
 
-        // Function to construct the full Mastofeed URL
+        // --- Functions ---
         const buildMastofeedUrl = (theme) => {
           const encodedUserUrl = encodeURIComponent(mastofeedParams.userurl);
-          // Construct query parameters, adding the dynamic theme
           const queryParams = `userurl=${encodedUserUrl}&theme=${theme}&size=${mastofeedParams.size}&header=${mastofeedParams.header}&replies=${mastofeedParams.replies}&boosts=${mastofeedParams.boosts}`;
           return `${mastofeedBase}?${queryParams}`;
         };
 
-        // Function to apply the theme to the page and update the iframe
         const applyTheme = (theme) => {
           // Apply theme to the main page
           htmlElement.dataset.theme = theme;
 
+          // Update icons
+          const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+          iconSpans.forEach(span => {
+            if (span) span.innerHTML = iconHTML;
+          });
+
           // Update the iframe src if the iframe exists
           if (mastofeedIframe) {
             const newSrc = buildMastofeedUrl(theme);
-            // Only update src if it's different, to avoid unnecessary reloads on initial load
-            // unless the iframe hasn't loaded its initial content yet
-            if (!mastofeedIframe.src || mastofeedIframe.src !== newSrc) {
-              console.log(`Updating iframe theme to: ${theme}`); // For debugging
-              mastofeedIframe.src = newSrc;
+            // Only update src if it's different or not set yet
+            if (!mastofeedIframe.src || mastofeedIframe.getAttribute('src') !== newSrc) {
+              console.log(`Updating iframe theme to: ${theme}`);
+              mastofeedIframe.setAttribute('src', newSrc); // Use setAttribute for clarity
             }
           } else {
-            console.warn("Mastofeed iframe not found");
+            // Only warn if we expected the iframe (might not be present on all pages)
+            // console.warn("Mastofeed iframe not found on this page.");
           }
         };
 
-        // Function to get the preferred theme (localStorage > system > default)
         const getPreferredTheme = () => {
           const savedTheme = localStorage.getItem(storageKey);
           if (savedTheme) return savedTheme;
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         };
+
+        const handleToggleClick = () => {
+          let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+          let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(newTheme);
+          localStorage.setItem(storageKey, newTheme);
+        }
 
         // --- Initialization ---
         let currentTheme = getPreferredTheme();
-        // Apply the initial theme (this will also set the initial iframe src correctly)
-        applyTheme(currentTheme);
+        applyTheme(currentTheme); // Apply initial theme and set initial iframe src
 
-        // --- Event Listener ---
-        if (toggleButton) {
-          toggleButton.addEventListener('click', () => {
-            // Determine the new theme
-            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            // Apply the new theme (this updates page and iframe src)
-            applyTheme(currentTheme);
-            // Save the preference
-            localStorage.setItem(storageKey, currentTheme);
+        // Add listeners to all toggle buttons found
+        if (toggleButtons.length > 0) {
+          toggleButtons.forEach(button => {
+            button.addEventListener('click', handleToggleClick);
           });
         } else {
-          console.warn("Theme toggle button not found");
+          // console.warn("Theme toggle button(s) not found");
         }
       })();
     </script>
