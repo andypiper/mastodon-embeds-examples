@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="module" src="https://pyscript.net/releases/2024.4.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.4.1/core.css">
+
+
+    <title>Single Post Embed via PyScript (Mastodon.py)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords"
+      content="mastodon, embed, pyscript, python, mastodon.py, api, fediverse, example" />
+    <meta name="description"
+      content="Example showing how to embed a single Mastodon post using PyScript and Mastodon.py to fetch and render data." />
+
+    <meta property="og:title" content="Mastodon Post Embed Example (PyScript/Mastodon.py)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/single-post-pyscript.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to embed a single Mastodon post using PyScript and Mastodon.py." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+
+    <style>
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      #mastodonpy-output {
+        min-height: 100px;
+        /* Placeholder height while loading */
+        border: 1px solid #dbdbdb;
+        border-radius: 6px;
+        padding: 0;
+        margin-top: 1rem;
+        background-color: white;
+        overflow: hidden;
+      }
+
+      [data-theme="dark"] #mastodonpy-output {
+        border-color: #4a4a4a;
+        background-color: #2e2e2e;
+      }
+
+      /* Styling for the rendered post card */
+      .mastodonpy-post .card-content {
+        padding: 1.25rem;
+        /* Padding inside the card */
+      }
+
+      .mastodonpy-post .boosted-by {
+        font-size: 0.9em;
+        color: #7a7a7a;
+        padding: 0.5rem 1.25rem;
+        border-bottom: 1px solid #dbdbdb;
+        background-color: #f5f5f5;
+      }
+
+      [data-theme="dark"] .mastodonpy-post .boosted-by {
+        color: #b5b5b5;
+        border-bottom-color: #4a4a4a;
+        background-color: #3a3a3a;
+      }
+
+      .mastodonpy-post .author-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+
+      .mastodonpy-post .author-info img {
+        width: 48px;
+        height: 48px;
+        border-radius: 4px;
+        margin-right: 0.75rem;
+      }
+
+      .mastodonpy-post .author-info .names .display-name {
+        font-weight: bold;
+      }
+
+      .mastodonpy-post .author-info .names .username {
+        color: #7a7a7a;
+        font-size: 0.9em;
+      }
+
+      [data-theme="dark"] .mastodonpy-post .author-info .names .username {
+        color: #b5b5b5;
+      }
+
+      .mastodonpy-post .post-content {
+        margin-bottom: 1rem;
+        word-wrap: break-word;
+      }
+
+      .mastodonpy-post .post-content p {
+        margin-bottom: 0.75em !important;
+      }
+
+      .mastodonpy-post .post-content a {
+        color: hsl(217, 71%, 53%);
+      }
+
+      [data-theme="dark"] .mastodonpy-post .post-content a {
+        color: hsl(204, 71%, 63%);
+      }
+
+      .media-attachments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 1rem;
+      }
+
+      .media-attachments img,
+      .media-attachments video,
+      .media-attachments audio {
+        /* Apply border to all media previews */
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 4px;
+        border: 1px solid #dbdbdb;
+        display: block;
+        background-color: #eee;
+      }
+
+      .media-attachments a span {
+        display: inline-block;
+        padding: 0.5em;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        font-size: 0.9em;
+        color: #363636;
+        text-decoration: none;
+      }
+
+      [data-theme="dark"] .media-attachments img,
+      [data-theme="dark"] .media-attachments video,
+      [data-theme="dark"] .media-attachments audio {
+        border-color: #4a4a4a;
+        background-color: #444;
+      }
+
+      [data-theme="dark"] .media-attachments a span {
+        border-color: #4a4a4a;
+        background-color: #3a3a3a;
+        color: #eee;
+      }
+
+      .poll {
+        margin-bottom: 1rem;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 0.75rem;
+      }
+
+      [data-theme="dark"] .poll {
+        border-color: #4a4a4a;
+      }
+
+      .poll ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .poll li {
+        margin-bottom: 0.5rem;
+      }
+
+      .poll .option-title {
+        font-weight: bold;
+      }
+
+      .poll .option-votes {
+        font-size: 0.9em;
+        color: #7a7a7a;
+        margin-left: 0.5em;
+      }
+
+      [data-theme="dark"] .poll .option-votes {
+        color: #b5b5b5;
+      }
+
+      .preview-card {
+        margin-bottom: 1rem;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      [data-theme="dark"] .preview-card {
+        border-color: #4a4a4a;
+      }
+
+      .preview-card img {
+        display: block;
+        max-width: 100%;
+      }
+
+      .preview-card .card-info {
+        padding: 0.75rem;
+      }
+
+      .preview-card .card-title {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+
+      .preview-card .card-description {
+        font-size: 0.9em;
+        color: #555;
+        margin-bottom: 0.25rem;
+      }
+
+      [data-theme="dark"] .preview-card .card-description {
+        color: #ccc;
+      }
+
+      .preview-card .card-url {
+        font-size: 0.8em;
+        color: #7a7a7a;
+      }
+
+      [data-theme="dark"] .preview-card .card-url {
+        color: #b5b5b5;
+      }
+
+
+      .mastodonpy-post .post-meta {
+        font-size: 0.85em;
+        color: #7a7a7a;
+        border-top: 1px solid #dbdbdb;
+        padding-top: 0.75rem;
+        margin-top: 1rem;
+      }
+
+      [data-theme="dark"] .mastodonpy-post .post-meta {
+        color: #b5b5b5;
+        border-top-color: #4a4a4a;
+      }
+
+      .mastodonpy-post .post-meta a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      /* Hide PyScript loading banner */
+      py-loader {
+        display: none;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section">
+      <div class="container">
+
+        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+
+        <h1 class="title">Mastodon Single Post Embed via PyScript + Mastodon.py</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About This Method</h2>
+            <p>
+              This example uses <a href="https://pyscript.net/" target="_blank" rel="noopener noreferrer">PyScript</a>
+              to run Python code directly in the browser, with the <code>pyodide_http.patch_all()</code> method
+              to enable the <a href="https://mastodonpy.readthedocs.io/" target="_blank"
+                rel="noopener noreferrer">Mastodon.py</a> library.
+            </p>
+            <p>
+              The Python code in this page fetches the raw status data for post <code>109349688112355529</code> from
+              <code>macaw.social</code> using <code>Mastodon.py</code>'s <code>status()</code> method (unauthenticated).
+              It then constructs HTML to display the post details and injects it into the page using PyScript's <code>display()</code> function.
+            </p>
+            <p>
+              This gives full control over rendering using Python, but requires writing the HTML generation code. Be aware
+              that fetching data might fail if the instance requires authentication (even for public posts).
+            </p>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Post (via PyScript + Mastodon.py)</h2>
+            <p>The following post data was fetched and rendered using Python running in the browser:</p>
+
+            <div id="mastodonpy-output">
+              <p><i>Loading post data via PyScript...</i></p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Powered by <a href="https://pyscript.net/" target="_blank">PyScript</a> and
+          <a href="https://mastodonpy.readthedocs.io/" target="_blank">Mastodon.py</a>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+      </footer>
+
+    <py-config>
+      packages = ["mastodon-py", "pyodide-http"]
+    </py-config>
+
+    <!-- here is all of the Python code -->
+  <script type="py">
+import js # To interact with JavaScript/DOM
+import html # For escaping HTML content
+from mastodon import Mastodon
+import pyodide_http # required patching library
+from datetime import datetime
+
+
+INSTANCE_URL = "https://macaw.social"
+STATUS_ID = "109349688112355529"
+OUTPUT_DIV_ID = "mastodonpy-output"
+
+
+def safe_escape(value, default=''):
+    """Safely converts to string and escapes, providing a default."""
+    # Ensure value is not None before str(), although str(None) is 'None'
+    return html.escape(str(value or default))
+
+def display_error(message):
+    """Helper to display errors in the output div using innerHTML."""
+    output_div = js.document.getElementById(OUTPUT_DIV_ID)
+    if output_div:
+        # Construct the HTML string for the error
+        error_html = f'<div class="notification is-danger">{safe_escape(message)}</div>'
+        # Set innerHTML
+        output_div.innerHTML = error_html
+    print(f"Error: {message}")
+
+def render_media(media_attachments):
+    """Generates HTML for media attachments."""
+    if not media_attachments: return ""
+    media_html = '<div class="media-attachments">'
+    for media in media_attachments:
+        media_type = media.get('type') or 'unknown'
+        preview_url = safe_escape(media.get('preview_url'))
+        remote_url = safe_escape(media.get('remote_url') or media.get('url'), '#')
+        description = safe_escape(media.get('description'), f'{media_type} attachment')
+
+        if media_type in ['image', 'gifv'] and preview_url:
+            media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer"><img src="{preview_url}" alt="{description}" title="{description}" loading="lazy"></a>'
+        elif media_type == 'video' and preview_url:
+             media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer" title="{description} (Video)"><img src="{preview_url}" alt="{description}"></a>'
+        elif media_type == 'audio':
+              media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer" title="{description}"><span>&#127925; (Audio Link)</span></a>'
+        else:
+            media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer"><span>[Attachment: {safe_escape(media_type)}]</span></a>'
+    media_html += '</div>'
+    return media_html
+
+def render_poll(poll_data):
+    """Generates HTML for a poll."""
+    if not poll_data: return ""
+    options_html = "<ul>"
+    for option in poll_data.get('options', []):
+        title = safe_escape(option.get('title'))
+        votes = option.get('votes_count', '?')
+        options_html += f'<li><span class="option-title">{title}</span> <span class="option-votes">({votes if votes is not None else "?"} votes)</span></li>'
+    options_html += "</ul>"
+
+    expires_at_val = poll_data.get('expires_at')
+    expires_str = ""
+    if expires_at_val:
+        try:
+            temp_dt = None
+            if isinstance(expires_at_val, datetime):
+                temp_dt = expires_at_val
+            elif isinstance(expires_at_val, str):
+                 # Only call replace if it's a string
+                 temp_dt = datetime.fromisoformat(expires_at_val.replace('Z', '+00:00'))
+            # Removed the 'else' block trying to convert unknown types to avoid potential errors
+
+            if temp_dt: # If we successfully got a datetime object
+                 expires_str = f"Expires: {temp_dt.strftime('%Y-%m-%d %H:%M')}"
+            else: # Fallback if conversion failed or type was unexpected but not None
+                 expires_str = f"Expires: {safe_escape(expires_at_val)}"
+
+        except Exception as date_err:
+             print(f"Error parsing poll expiry date: {date_err}")
+             expires_str = f"Expires: {safe_escape(expires_at_val)}" # Fallback
+
+    status = "Expired" if poll_data.get('expired', False) else expires_str
+    multiple = "Multiple choice" if poll_data.get('multiple', False) else "Single choice"
+    total_votes = poll_data.get('votes_count', '?')
+
+    poll_html = f"""
+    <div class="poll content">
+        <h4>Poll ({multiple})</h4>{options_html}
+        <p><small>Total Votes: {total_votes if total_votes is not None else "?"} | {status}</small></p>
+    </div>"""
+    return poll_html
+
+def render_card(card_data):
+     """Generates HTML for a preview card."""
+     if not card_data: return ""
+     card_url = safe_escape(card_data.get('url'), '#')
+     card_title = safe_escape(card_data.get('title'))
+     card_desc = safe_escape(card_data.get('description'))
+     card_img = safe_escape(card_data.get('image'))
+     card_provider = safe_escape(card_data.get('provider_name'))
+     card_html = f'<div class="preview-card">'
+     if card_img: card_html += f'<a href="{card_url}" target="_blank" rel="noopener noreferrer"><img src="{card_img}" alt="" loading="lazy"></a>'
+     card_html += '<div class="card-info content">'
+     if card_title: card_html += f'<a href="{card_url}" target="_blank" rel="noopener noreferrer"><strong class="card-title">{card_title}</strong></a>'
+     if card_desc: card_html += f'<p class="card-description">{card_desc}</p>'
+     card_link_text = card_provider if card_provider else card_url
+     card_html += f'<a href="{card_url}" target="_blank" rel="noopener noreferrer" class="card-url">{card_link_text}</a>'
+     card_html += '</div></div>'
+     return card_html
+
+def render_status(status_data, output_div):
+    """Renders the status HTML."""
+    if not output_div:
+         print("Error: Output element 'mastodonpy-output' not found.")
+         return
+    if not status_data:
+        display_error("Could not retrieve status data (API returned None or empty).")
+        return
+
+    is_reblog = status_data.get('reblog') is not None
+    status = status_data['reblog'] if is_reblog else status_data
+    account = status.get('account', {})
+    display_name = safe_escape(account.get('display_name'), 'Unknown User')
+    username = safe_escape(account.get('acct'))
+    avatar_url = safe_escape(account.get('avatar_static'))
+    post_content_html = status.get('content') or ''
+    post_url = safe_escape(status.get('url'), '#')
+    created_at_val = status.get('created_at')
+
+    formatted_date = 'Unknown date'
+    if created_at_val:
+        try:
+            temp_dt = None
+            if isinstance(created_at_val, datetime): # Check if it's already datetime
+                temp_dt = created_at_val
+            elif isinstance(created_at_val, str): # Check if it's a string
+                 # Only call replace on the string
+                 temp_dt = datetime.fromisoformat(created_at_val.replace('Z', '+00:00'))
+            # Removed the 'else' block trying to convert unknown types
+
+            if temp_dt: # If we successfully got a datetime object
+                formatted_date = temp_dt.strftime('%Y-%m-%d %H:%M:%S %Z')
+            else: # Fallback if type was unexpected but not None
+                formatted_date = safe_escape(created_at_val)
+
+        except Exception as date_err:
+             print(f"Error formatting created_at date: {date_err}")
+             formatted_date = safe_escape(created_at_val) # Fallback to escaped original
+
+    boost_html = ""
+    if is_reblog:
+        reblogger_account = status_data.get('account', {})
+        reblogger_name = safe_escape(reblogger_account.get('display_name'), 'Unknown User')
+        reblogger_acct = safe_escape(reblogger_account.get('acct'))
+        boost_html = f'<div class="boosted-by">🔁 Boosted by {reblogger_name} (@{reblogger_acct})</div>'
+
+    media_html = render_media(status.get('media_attachments', []))
+    poll_html = render_poll(status.get('poll'))
+    card_html = render_card(status.get('card'))
+
+    post_html = f"""
+    <div class="mastodonpy-post card">
+        {boost_html}
+        <div class="card-content">
+            <div class="media author-info">
+                <div class="media-left">
+                    <figure class="image is-48x48">
+                         <img src="{avatar_url}" alt="{display_name} avatar" loading="lazy" class="is-rounded">
+                    </figure>
+                </div>
+                <div class="media-content names">
+                     <p class="title is-5 display-name">{display_name}</p>
+                     <p class="subtitle is-6 username">@{username}</p>
+                </div>
+            </div>
+            {media_html}
+            {poll_html}
+            {card_html}
+            <div class="content post-content">{post_content_html}</div>
+            <div class="post-meta content is-small">
+                <a href="{post_url}" target="_blank" rel="noopener noreferrer">Posted on: {formatted_date}</a>
+            </div>
+        </div>
+    </div>
+    """
+    # Use innerHTML to render the generated HTML string
+    output_div.innerHTML = post_html
+    print("Post rendered successfully.")
+
+try:
+    pyodide_http.patch_all()
+    print("Network requests patched.")
+    api = Mastodon(api_base_url=INSTANCE_URL)
+    print(f"Fetching status ID: {STATUS_ID}")
+    status_data = api.status(STATUS_ID)
+    print("Status data received.")
+    output_div_element = js.document.getElementById(OUTPUT_DIV_ID)
+    render_status(status_data, output_div_element)
+
+except Exception as e:
+    display_error(e)
+
+  </script>
+
+
+    <script>
+      (function () {
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const storageKey = 'theme-preference';
+
+        const applyTheme = (theme) => {
+          htmlElement.dataset.theme = theme;
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme);
+
+        if (toggleButton) {
+          toggleButton.addEventListener('click', () => {
+            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+            localStorage.setItem(storageKey, currentTheme);
+          });
+        } else {
+          console.warn("Theme toggle button not found");
+        }
+      })();
+    </script>
+
+  </body>
+
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>User Timeline via RSS Feed (JavaScript)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords"
+      content="mastodon, embed, timeline, rss, xml, javascript, fediverse, example" />
+    <meta name="description"
+      content="Example showing how to display a user timeline by fetching and parsing their Mastodon RSS feed using client-side JavaScript." />
+
+    <meta property="og:title" content="Mastodon User Timeline via RSS Feed (JavaScript)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/timeline-basic-rss.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to display a user timeline by fetching and parsing their Mastodon RSS feed." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      #rss-timeline-output {
+        min-height: 200px;
+        margin-top: 1rem;
+      }
+
+      /* Styling for the rendered timeline posts */
+      .rss-timeline-post {
+        border: 1px solid #dbdbdb;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: white;
+      }
+
+      [data-theme="dark"] .rss-timeline-post {
+        border-color: #4a4a4a;
+        background-color: #2e2e2e;
+      }
+
+      .rss-timeline-post .post-content {
+        margin-bottom: 0.75rem;
+        word-wrap: break-word;
+        font-size: 0.95em;
+      }
+
+      .rss-timeline-post .post-content p {
+        margin-bottom: 0.5em !important;
+      }
+
+      .rss-timeline-post .post-content a {
+        color: hsl(217, 71%, 53%);
+      }
+
+      [data-theme="dark"] .rss-timeline-post .post-content a {
+        color: hsl(204, 71%, 63%);
+      }
+
+      .rss-timeline-post .post-meta {
+        font-size: 0.8em;
+        color: #7a7a7a;
+        padding-top: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      [data-theme="dark"] .rss-timeline-post .post-meta {
+        color: #b5b5b5;
+      }
+
+      .rss-timeline-post .post-meta a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      /* Style for config inputs */
+      .config-section label {
+        font-weight: bold;
+      }
+
+      .config-section input {
+        margin-bottom: 0.5rem;
+      }
+
+      .message {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section">
+      <div class="container">
+
+        <button class="button theme-toggle-button">Toggle Theme</button>
+
+        <h1 class="title">Mastodon User Timeline via RSS Feed</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About This Method</h2>
+            <p>
+              Mastodon instances provide a public RSS feed for each user's public posts, found at
+              <code>https://[instance.domain]/users/[username].rss</code>.
+            </p>
+            <p>
+              This example uses client-side JavaScript to attempt to fetch this RSS feed, parse the XML content using
+              the browser's built-in <code>DOMParser</code>, and then render the latest posts below.
+            </p>
+
+            <article class="message is-info">
+              <div class="message-header">
+                <p>Content Limitations</p>
+              </div>
+              <div class="message-body">
+                The RSS feed only includes the user's <em>public, original posts</em>. It excludes replies
+                and boosts.<br>
+                The standard RSS format lacks a specific field for <em>Content Warnings (CWs)</em>. Posts with
+                CWs will have their full content displayed immediately.
+              </div>
+            </article>
+
+            <article class="message is-warning">
+              <div class="message-header">
+                <p>CORS Limitation</p>
+              </div>
+              <div class="message-body">
+                Fetching resources (like RSS feeds) directly from a different domain using JavaScript is often blocked
+                by browser security policies (CORS). This example <em>may not work reliably</em> unless the Mastodon
+                instance's server is configured to allow requests from your website's origin, or if you use a <a
+                  href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin#what_went_wrong"
+                  target="_blank" rel="noopener noreferrer">CORS proxy</a>. It is included mainly as a demonstration of
+                parsing the feed format. Check the browser console for errors if the feed doesn't load.
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="box config-section">
+          <div class="content">
+            <h2 class="title is-4">Configuration</h2>
+            <div class="field">
+              <label class="label" for="rss-instance">Instance Domain:</label>
+              <div class="control">
+                <input class="input" type="text" id="rss-instance" value="macaw.social">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="rss-username">Username:</label>
+              <div class="control">
+                <input class="input" type="text" id="rss-username" value="andypiper">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="rss-limit">Number of Posts:</label>
+              <div class="control">
+                <input class="input" type="number" id="rss-limit" value="15" min="1" max="20">
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <button id="fetch-rss-button" class="button is-info">Fetch & Render RSS Feed</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Timeline (from RSS)</h2>
+            <p>Attempting to fetch and display the latest posts from the RSS feed:</p>
+            <div id="rss-timeline-output">
+              <p><i>Click button above to load feed...</i></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+        const htmlElement = document.documentElement;
+        const storageKey = 'theme-preference';
+
+        const applyTheme = (theme) => {
+          htmlElement.dataset.theme = theme;
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const handleToggleClick = () => {
+          let currentTheme = htmlElement.dataset.theme;
+          let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(newTheme);
+          localStorage.setItem(storageKey, newTheme);
+        }
+
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme);
+
+        if (toggleButtons.length > 0) {
+          toggleButtons.forEach(button => {
+            button.addEventListener('click', handleToggleClick);
+          });
+        } else {
+          console.warn("Theme toggle button(s) not found");
+        }
+      })();
+    </script>
+
+    <script>
+      const fetchButton = document.getElementById('fetch-rss-button');
+      const outputDiv = document.getElementById('rss-timeline-output');
+      const instanceInput = document.getElementById('rss-instance');
+      const usernameInput = document.getElementById('rss-username');
+      const limitInput = document.getElementById('rss-limit');
+
+      const getText = (element, tagName) => {
+        const node = element.querySelector(tagName);
+        return node ? node.textContent : '';
+      };
+
+      const fetchAndRenderRSS = () => {
+        const instance = instanceInput.value.trim();
+        const username = usernameInput.value.trim();
+        const limit = parseInt(limitInput.value, 10) || 10;
+
+        if (!instance || !username) {
+          outputDiv.innerHTML = '<div class="notification is-danger">Please enter both instance and username.</div>';
+          return;
+        }
+
+        const rssUrl = `https://${instance}/users/${username}.rss`;
+        outputDiv.innerHTML = `<p><i>Fetching ${rssUrl}...</i></p>`;
+
+        fetch(rssUrl)
+          .then(response => {
+            if (!response.ok) {
+              if (response.status === 0 || response.type === 'opaque') {
+                throw new Error(`Network error fetching RSS feed. This is likely a CORS issue preventing the browser from accessing the feed directly from a different domain. Check the browser console for details.`);
+              }
+              throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+            }
+            return response.text();
+          })
+          .then(xmlText => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+            const parseError = xmlDoc.querySelector("parsererror");
+            if (parseError) {
+              console.error("XML Parsing Error:", parseError);
+              throw new Error(`Failed to parse RSS feed. Response might not be valid XML or the content type was incorrect. Check console.`);
+            }
+
+            const items = xmlDoc.querySelectorAll('item');
+            let allPostsHtml = '';
+            let count = 0;
+
+            items.forEach(item => {
+              if (count >= limit) return;
+
+              const link = getText(item, 'link');
+              const pubDateStr = getText(item, 'pubDate');
+              const description = getText(item, 'description');
+
+              let formattedDate = 'Unknown date';
+              if (pubDateStr) {
+                try {
+                  formattedDate = new Date(pubDateStr).toLocaleString();
+                } catch (e) {
+                  console.warn(`Could not parse date: ${pubDateStr}`);
+                  formattedDate = pubDateStr;
+                }
+              }
+
+              // WARNING: Rendering HTML from external source directly has security risks.
+              // Also, this does not handle Content Warnings within the description.
+              allPostsHtml += `
+                            <div class="rss-timeline-post">
+                                <div class="content post-content">${description || '(No content)'}</div>
+                                <div class="post-meta">
+                                    <a href="${link}" target="_blank" rel="noopener noreferrer">Published: ${formattedDate}</a>
+                                </div>
+                            </div>`;
+              count++;
+            });
+
+            if (allPostsHtml) {
+              outputDiv.innerHTML = allPostsHtml;
+            } else {
+              outputDiv.innerHTML = '<p>No posts found in the RSS feed.</p>';
+            }
+          })
+          .catch(error => {
+            console.error("Error fetching or parsing RSS feed:", error);
+            outputDiv.innerHTML = `<div class="notification is-danger">${error.message || 'An unknown error occurred.'}</div>`;
+          });
+      };
+
+      if (fetchButton) {
+        fetchButton.addEventListener('click', fetchAndRenderRSS);
+      }
+
+    </script>
+
+  </body>
+
+</html>

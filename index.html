@@ -1,156 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!-- this HTML markup is really quick and dirty, to be improved -->
+
   <head>
     <meta charset="utf-8" />
-    <title>Testing Fediverse embeds</title>
-    <meta name="author" content="@andypiper@macaw.social" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="keywords"
-      content="mastodon, fediverse, pixelfed, oembed, embed timeline, toot"
-    />
-    <meta
-      name="description"
-      content="Examples of embedding Fediverse content (timelines, toots, Pixelfed images)"
-    />
-    <meta
-      property="og:title"
-      content="Examples of embedding Fediverse content (timelines and toots, Pixelfed posts)"
-    />
+
+    <title>Mastodon Embed Examples</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed, timeline, examples, javascript, pyscript, python" />
+    <meta name="description" content="Examples of embedding Mastodon posts and timelines." />
+
+    <meta property="og:title" content="Mastodon Embed Examples" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mastodon-embeds.glitch.me" />
-    <meta property="og:image" content="https://cdn.glitch.global/48c537a6-fc5b-406e-a715-0a10ff5bd8a5/logo-purple-sketch.svg?1710938243680" />
-    <link rel="stylesheet" href="css/basic.css" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/index.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description" content="Examples of embedding Mastodon posts and timelines." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      .logo-figure {
+        margin: 0;
+      }
+
+       .columns.is-equal-height > .column {
+          display: flex;
+          flex-direction: column;
+      }
+      .columns.is-equal-height > .column > .box {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+      }
+       .columns.is-equal-height > .column > .box > .content {
+           flex-grow: 1;
+       }
+    </style>
+
   </head>
 
   <body>
-    <figure>
-      <img
-        src="./mastodon-logo.svg"
-        width="50"
-        align="right"
-        style="padding-left: 20px"
-      />
-    </figure>
-    <div>
-      This is a simple project for testing embeds of content from
-      <em><a href="https://joinfediverse.wiki/">the Fediverse</a></em> (in this
-      case, currently Mastodon and Pixelfed) using different tools and
-      methods.<br /><br />
 
-      📝
-      <a href="https://dev.to/andypiper/a-opportunity-for-developers-1ee4"
-        >Read more on DEV</a
-      >.<br />
-    </div>
-    <div>
-      &nbsp;<br />
-      <strong>Mastodon Posts ("toots")</strong>
-      <div>
-        Posts are straightforward to embed (Mastodon's API supports
-        <a href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a>, and
-        it has an embed code option on the default web UI), timelines
-        <a href="https://github.com/mastodon/mastodon/issues/6094"
-          >need a bit more work</a
-        >.
-      </div>
+    <section class="section">
+      <div class="container">
 
-      <ul>
-        <li>
-          A single post using the default embed option from Mastodon -
-          <a href="./default-toot.html">example</a>
-        </li>
-        <li>
-          A single unformatted post (JSON data) pulled from the Mastodon API -
-          <a href="./single-toot-api.html">example</a>
-        </li>
-      </ul>
-      <strong>Mastodon Timelines</strong>
-      <div>
-        There is no built-in support for embedding a timeline directly from
-        Mastodon, so some work with the API is required. Good opportunity to
-        learn the API, and to build something new! 🛠️
-      </div>
-      <ul>
-        <li>Using Mastofeed - <a href="./mastofeed.html">example</a></li>
-        <li>
-          Using mastodon-embed-feed-timeline - <a href="./meft.html">example</a>
-        </li>
-        <li>Using Maplefeed - <a href="./maplefeed.html">example</a></li>
-        <li>Using Emfed - <a href="./emfed.html">example</a></li>
-      </ul>
-      <div>
-        One additional useful thing to know is that Mastodon timelines also have
-        RSS feeds as standard: <code>[instance]/users/[username].rss</code> -
-        for the sake of example, mine is
-        <em
-          ><a href="https://macaw.social/users/andypiper.rss"
-            >https://macaw.social/users/andypiper.rss</a
-          ></em
-        >
-        - this means that you can plug this in to any widget that styles an RSS
-        feed on a site, for example (although it might not look quite the same
-        as a "proper" timeline on a Mastodon page), or, you can build a
-        component to use the data from there and style it as you prefer. Handy
-        info! <br />&nbsp;<br />
-      </div>
-      <strong>Image posts (Pixelfed)</strong>
-      <div>
-        The
-        <a href="https://docs.pixelfed.org/technical-documentation/api/"
-          >Pixelfed API</a
-        >
-        is similar to Mastodon v1; it does not offer an oEmbed endpoint (that I
-        have found).
+        <button class="button theme-toggle-button">Toggle Theme</button>
 
-        <ul>
-          <li>
-            A single post using the default embed option from Pixelfed -
-            <a href="./default-pixelfed.html">example</a>
-          </li>
-        </ul>
+        <div class="columns is-vcentered mb-5">
+          <div class="column is-narrow">
+            <figure class="image is-64x64 logo-figure">
+              <img src="./mastodon-logo.svg" alt="Mastodon Logo">
+            </figure>
+          </div>
+          <div class="column">
+            <h1 class="title">Mastodon Embed Examples</h1>
+            <p class="subtitle">Testing various ways to embed Mastodon content.</p>
+          </div>
+        </div>
 
-        Pixelfed has Atom feeds for user timelines (not RSS) - they are at
-        <code>[instance]/users/[username].atom</code>
-      </div>
-      <br />
 
-      <div>
-        I've included a
-        <a href="https://github.com/Uden-AI/fediverse-share"
-          >Fediverse sharing button</a
-        >
-        on some of the pages. <br />&nbsp;<br />
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Introduction</h2>
+            <p>
+              This is a simple project for testing embeds of content from Mastodon using different tools and methods.
+              The goal is to provide clear, isolated examples.
+            </p>
+            <p>
+              📝 Read more background on DEV: <a href="https://dev.to/andypiper/a-opportunity-for-developers-1ee4"
+                target="_blank" rel="noopener noreferrer">The Fediverse is an Opportunity for Developers</a>.
+            </p>
+          </div>
+        </div>
+
+        <div class="columns is-equal-height">
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Mastodon Post Embeds</h3>
+                <p>Embedding single posts is straightforward using Mastodon's API (it supports
+                <a href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a>, and
+                there is an option to get embed code on the default web UI).</p>
+                <ul>
+                  <li><a href="./single-post-oembed.html">Single Post (Standard Embed/oEmbed)</a> - Uses the common
+                    blockquote embed.</li>
+                  <li><a href="./single-post-api.html">Single Post (API Data)</a> - Fetches raw JSON data via
+                    JavaScript.</li>
+                  <li><a href="./single-post-pyscript.html">Single Post (PyScript + oEmbed)</a> - Fetches oEmbed data
+                    via PyScript.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Mastodon Timeline Embeds</h3>
+                <p>Embedding timelines requires external services or client-side libraries, as Mastodon doesn't offer a
+                  built-in timeline embed.</p>
+                <ul>
+                  <li><a href="./timeline-basic-rss.html">Timeline via RSS feed</a> - Uses an RSS feed to display content (limitations apply).</li>
+                  <li><a href="./timeline-emfed.html">Timeline via Emfed (JS)</a> - Uses the Emfed library.</li>
+                  <li><a href="./timeline-mastofeed.html">Timeline via Mastofeed (iframe)</a> - Uses the Mastofeed
+                    service.</li>
+                  <li><a href="./timeline-meft.html">Timeline via MEFT (JS)</a> - Uses the mastodon-embed-feed-timeline
+                    library.</li>
+                  <li><a href="./timeline-pyscript.html">Timeline via PyScript + Mastodon.py</a> - Uses
+                    PyScript & Mastodon.py (requires authentication).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="columns is-equal-height">
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Other Notes</h3>
+                <p>Some examples include a <a href="https://github.com/Uden-AI/fediverse-share" target="_blank"
+                    rel="noopener noreferrer">Fediverse sharing button</a>.</p>
+                <p>The code for these examples is available on <a
+                    href="https://github.com/andypiper/mastodon-embeds-examples" target="_blank"
+                    rel="noopener noreferrer">GitHub</a>.</p>
+                <p>You can remix this project on Glitch:</p>
+                <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"><img
+                    src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
+                    alt="Remix on Glitch" style="height: 33px;"></a>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Find Me on the Fediverse</h3>
+                <p>Say hello 👋🏻:</p>
+                <ul>
+                  <li>📝 <a href="https://macaw.social/@andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@macaw.social</a></li>
+                  <li>📽️ <a href="https://makertube.net/a/andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@makertube.net</a></li>
+                  <li>📷 <a href="https://pixelfed.social/@andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@pixelfed.social</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div>
-        Learn more and read the code that does this by boopsing on the fishies
-        below! ⤵️ or, look at
-        <a href="https://github.com/andypiper/mastodon-embeds-examples"
-          >the GitHub project</a
-        >
-        (the same code, but needs to be deployed to a web server).<br />&nbsp;<br />
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
       </div>
-      <div>
-        <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"
-          ><img
-            src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
-            alt="Remix on Glitch"
-        /></a>
-      </div>
-      <div>
-        <br />
-        If you want to say hello 👋🏻 I live in the #Fediverse at: 
-        <ul>
-          <li>📝 
-        <a href="https://macaw.social/@andypiper">@andypiper@macaw.social</a></li>
-          <li>🖼️
-        <a href="https://pixelfed.social/@andypiper"
-          >@andypiper@pixelfed.social</a
-        ></li>
-          <li>📽️ <a href="https://makertube.net/a/andypiper">@andypiper@makertube.net</a></li>
-        </ul> 
-      </div>
-    </div>
+    </footer>
+
+    <script>
+      (function () {
+        const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+        const htmlElement = document.documentElement;
+        const storageKey = 'theme-preference';
+
+        const applyTheme = (theme) => {
+          htmlElement.dataset.theme = theme;
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const handleToggleClick = () => {
+          let currentTheme = htmlElement.dataset.theme;
+          let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(newTheme);
+          localStorage.setItem(storageKey, newTheme);
+        }
+
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme);
+
+        if (toggleButtons.length > 0) {
+          toggleButtons.forEach(button => {
+            button.addEventListener('click', handleToggleClick);
+          });
+        } else {
+          console.warn("Theme toggle button(s) not found");
+        }
+      })();
+    </script>
+
   </body>
+
 </html>
+

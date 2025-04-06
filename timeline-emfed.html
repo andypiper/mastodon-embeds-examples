@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mastodon Timeline Embed (Emfed Example)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed timeline, fediverse, example, javascript, emfed" />
+    <meta name="description"
+      content="Example showing how to embed a Mastodon timeline using the Emfed JavaScript library." />
+
+    <meta property="og:title" content="Mastodon Timeline Embed Example (Emfed)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/mfed-timeline.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to embed a Mastodon timeline using the Emfed JavaScript library." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="https://esm.sh/emfed@1/toots.css">
+
+    <style>
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      /* Add theme overrides for emfed-toots.css if necessary */
+      /* Example: */
+      /*
+      [data-theme="dark"] .toot {
+         background-color: #333;
+         border-color: #555;
+         color: #eee;
+      }
+      [data-theme="dark"] .toot a {
+         color: #8ab4f8;
+      }
+      */
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section">
+      <div class="container">
+
+        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+
+        <h1 class="title">Mastodon Timeline Embed: Emfed</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About This Method</h2>
+            <p>
+              This method uses the <a href="https://github.com/sampsyo/emfed" target="_blank"
+                rel="noopener noreferrer">Emfed</a> JavaScript library.
+              It fetches timeline data directly from the Mastodon API and renders it client-side, replacing a specific
+              anchor (<code>&lt;a&gt;</code>) tag on the page.
+            </p>
+            <p>
+              Configuration is done using <code>data-*</code> attributes directly on the anchor tag. Key attributes
+              include:
+            </p>
+            <ul>
+              <li><code>href</code>: The URL of the Mastodon user profile (e.g.,
+                <code>https://instance.social/@username</code>).
+              </li>
+              <li><code>class="mastodon-feed"</code>: Required class for Emfed to find the element.</li>
+              <li><code>data-toot-limit</code>: Maximum number of posts to display.</li>
+              <li><code>data-toot-account-id</code>: The numerical Account ID for the user. <strong>Required for
+                  fetching posts.</strong></li>
+              <li><code>data-exclude-reblogs</code>: Set to "true" to hide boosts/reblogs (optional).</li>
+            </ul>
+            <p>
+              <strong>Important:</strong> You need the Mastodon <strong>Account ID</strong> (a number, not the username)
+              for the account you want to embed. You can often find this using API tools (like searching the account via
+              <code>/.well-known/webfinger</code> on the instance and looking for the ID in the <code>self</code> link)
+              or sometimes by viewing the source code of the user's profile page.
+            </p>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Timeline</h2>
+            <p>Emfed will replace the anchor tag below with the rendered timeline:</p>
+
+            <div> <a class="mastodon-feed" href="https://macaw.social/@andypiper" data-toot-limit="10"
+                data-toot-account-id="109332977621728450" /* <<< Replace with desired Account ID */
+                data-exclude-reblogs="false" /* Set to "true" to hide boosts * />
+              Loading posts by @andypiper@macaw.social...
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const storageKey = 'theme-preference';
+
+        const applyTheme = (theme) => {
+          htmlElement.dataset.theme = theme;
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme);
+
+        if (toggleButton) {
+          toggleButton.addEventListener('click', () => {
+            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+            localStorage.setItem(storageKey, currentTheme);
+          });
+        } else {
+          console.warn("Theme toggle button not found");
+        }
+      })();
+    </script>
+
+    <script type="module" src="https://esm.sh/emfed"></script>
+
+  </body>
+
+</html>

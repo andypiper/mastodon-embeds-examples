@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="module" src="https://pyscript.net/releases/2024.4.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.4.1/core.css">
+
+    <title>User Timeline via PyScript (Mastodon.py + Auth)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords"
+      content="mastodon, embed, timeline, pyscript, python, mastodon.py, api, fediverse, example, oauth" />
+    <meta name="description"
+      content="Example showing how to display a user timeline using PyScript and Mastodon.py, including OAuth login." />
+
+    <meta property="og:title" content="Mastodon User Timeline Example (PyScript/Mastodon.py + Auth)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/timeline-pyscript.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to display a user timeline using PyScript and Mastodon.py, including OAuth login." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      /* Shared style for theme toggle buttons */
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      /* Hide elements initially */
+      #login-form,
+      #main-ui {
+        display: none;
+      }
+
+      #mastodonpy-timeline-output {
+        min-height: 200px;
+        margin-top: 1rem;
+      }
+
+      /* Styling for the rendered timeline posts (compact) */
+      .mastodonpy-timeline-post {
+        border: 1px solid #dbdbdb;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: white;
+      }
+
+      [data-theme="dark"] .mastodonpy-timeline-post {
+        border-color: #4a4a4a;
+        background-color: #2e2e2e;
+      }
+
+      .mastodonpy-timeline-post .boosted-by {
+        font-size: 0.85em;
+        color: #7a7a7a;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px dashed #dbdbdb;
+      }
+
+      [data-theme="dark"] .mastodonpy-timeline-post .boosted-by {
+        color: #b5b5b5;
+        border-bottom-color: #4a4a4a;
+      }
+
+      .mastodonpy-timeline-post .author-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .mastodonpy-timeline-post .author-info img {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+      }
+
+      .mastodonpy-timeline-post .author-info .names .display-name {
+        font-weight: bold;
+        font-size: 0.95em;
+      }
+
+      .mastodonpy-timeline-post .author-info .names .username {
+        color: #7a7a7a;
+        font-size: 0.85em;
+      }
+
+      [data-theme="dark"] .mastodonpy-timeline-post .author-info .names .username {
+        color: #b5b5b5;
+      }
+
+      .mastodonpy-timeline-post .post-content {
+        margin-bottom: 0.75rem;
+        word-wrap: break-word;
+        font-size: 0.95em;
+      }
+
+      .mastodonpy-timeline-post .post-content p {
+        margin-bottom: 0.5em !important;
+      }
+
+      .mastodonpy-timeline-post .post-content a {
+        color: hsl(217, 71%, 53%);
+      }
+
+      [data-theme="dark"] .mastodonpy-timeline-post .post-content a {
+        color: hsl(204, 71%, 63%);
+      }
+
+      .media-attachments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 0.75rem;
+      }
+
+      .media-attachments img,
+      .media-attachments video,
+      .media-attachments audio {
+        max-width: 100px;
+        max-height: 100px;
+        border-radius: 4px;
+        border: 1px solid #dbdbdb;
+        display: block;
+        background-color: #eee;
+      }
+
+      .media-attachments a span {
+        display: inline-block;
+        padding: 0.3em;
+        border: 1px solid #dbdbdb;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        font-size: 0.8em;
+        color: #363636;
+        text-decoration: none;
+      }
+
+      [data-theme="dark"] .media-attachments img,
+      [data-theme="dark"] .media-attachments video,
+      [data-theme="dark"] .media-attachments audio {
+        border-color: #4a4a4a;
+        background-color: #444;
+      }
+
+      [data-theme="dark"] .media-attachments a span {
+        border-color: #4a4a4a;
+        background-color: #3a3a3a;
+        color: #eee;
+      }
+
+      .mastodonpy-timeline-post .poll,
+      .mastodonpy-timeline-post .preview-card {
+        display: none;
+      }
+
+      .mastodonpy-timeline-post .post-meta {
+        font-size: 0.8em;
+        color: #7a7a7a;
+        padding-top: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      [data-theme="dark"] .mastodonpy-timeline-post .post-meta {
+        color: #b5b5b5;
+      }
+
+      .mastodonpy-timeline-post .post-meta a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      py-loader {
+        display: none;
+      }
+
+      /* Style login form */
+      #login-form {
+        margin-top: 2rem;
+      }
+
+      #login-messages .notification {
+        margin-top: 1rem;
+      }
+
+      /* Style logout button position */
+      #logout-button {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+    </style>
+
+    <py-config>
+      packages = ["mastodon-py", "pyodide-http"]
+    </py-config>
+
+  </head>
+
+  <body>
+
+    <section class="section">
+      <div class="container">
+
+        <div id="login-form" class="box">
+          <button class="button theme-toggle-button">Toggle Theme</button>
+          <h2 class="title is-4">Login Required</h2>
+          <div class="content">
+            <p>To view the timeline, please enter your Mastodon instance URL and log in.</p>
+            <div class="field">
+              <label class="label" for="instance-input">Instance URL</label>
+              <div class="control">
+                <input class="input" type="text" id="instance-input" placeholder="https://your.instance.social">
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <button id="login-button" class="button is-primary">Login via Mastodon</button>
+              </div>
+            </div>
+            <div id="login-messages"></div>
+          </div>
+        </div>
+
+        <div id="main-ui">
+          <div>
+            <button class="button theme-toggle-button">Toggle Theme</button>
+          </div>
+
+          <h1 class="title">Mastodon User Timeline via PyScript + Mastodon.py</h1>
+
+          <div class="box">
+            <div class="content">
+              <h2 class="title is-4">About This Method</h2>
+              <p>
+                This example uses <a href="https://pyscript.net/" target="_blank" rel="noopener noreferrer">PyScript</a>
+                and the <a href="https://mastodonpy.readthedocs.io/" target="_blank"
+                  rel="noopener noreferrer">Mastodon.py</a> library (enabled via <code>pyodide_http.patch_all()</code>)
+                to fetch and render a user's timeline directly in the browser after authenticating via OAuth.
+              </p>
+              <p>
+                The Python code uses an access token stored in the browser's localStorage to authenticate with the
+                Mastodon API. It then fetches the 10 most recent posts for the specified Account ID
+                (<code>109332977621728450</code> from <code>macaw.social</code>) using
+                <code>api.account_statuses()</code> and renders them below.
+              </p>
+            </div>
+          </div>
+
+          <button id="logout-button" class="button">Logout</button>
+
+          <div class="box">
+            <div class="content">
+              <h2 class="title is-4">Rendered Timeline</h2>
+              <p>Displaying the 10 most recent posts for the configured account:</p>
+              <div id="mastodonpy-timeline-output">
+                <p><i>Loading timeline data via PyScript...</i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+            Powered by <a href="https://pyscript.net/" target="_blank">PyScript</a> and
+            <a href="https://mastodonpy.readthedocs.io/" target="_blank">Mastodon.py</a>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script type="py">
+import js # To interact with JavaScript/DOM
+import html # For escaping HTML content
+from mastodon import Mastodon # Import the library
+import pyodide_http # Import the patching library
+from datetime import datetime # For date formatting
+import urllib.parse
+from pyodide.ffi import create_proxy
+
+# --- Configuration ---
+INSTANCE_URL_KEY = "masto_instance"
+CLIENT_ID_KEY = "masto_client_id"
+CLIENT_SECRET_KEY = "masto_client_secret"
+ACCESS_TOKEN_KEY = "masto_access_token"
+APP_NAME = "PyScriptTimelineDemo"
+SCOPES = ["read"] # Only need read scope for timeline
+REDIRECT_URI = js.window.location.href.split('?')[0] # Use base URL without query params
+
+# Target Account ID (Andy Piper's ID on macaw.social) - Can be changed
+TARGET_ACCOUNT_ID = "109332977621728450"
+TIMELINE_LIMIT = 10 # Number of posts to fetch
+OUTPUT_DIV_ID = "mastodonpy-timeline-output"
+
+# --- DOM Elements ---
+login_form_el = js.document.getElementById("login-form")
+main_ui_el = js.document.getElementById("main-ui")
+inst_input_el = js.document.getElementById("instance-input")
+login_messages_el = js.document.getElementById("login-messages")
+login_button_el = js.document.getElementById("login-button")
+logout_button_el = js.document.getElementById("logout-button")
+output_div_el = js.document.getElementById(OUTPUT_DIV_ID)
+# Select ALL theme toggle buttons by class
+theme_toggle_buttons = js.document.querySelectorAll(".theme-toggle-button")
+
+# --- Global API object ---
+api = None
+
+# --- Helper Functions ---
+
+def safe_escape(value, default=''):
+    return html.escape(str(value or default))
+
+def display_message(el, message, is_error=False):
+    """Displays messages in a target element."""
+    if el:
+        css_class = "is-danger" if is_error else "is-info"
+        el.innerHTML += f'<div class="notification {css_class} is-light">{safe_escape(message)}</div>'
+    print(f"{'Error' if is_error else 'Info'}: {message}")
+
+def clear_message(el):
+     if el: el.innerHTML = ""
+
+def store(k, v): js.localStorage.setItem(k, v)
+def load(k): return js.localStorage.getItem(k)
+def remove(k): js.localStorage.removeItem(k)
+
+def show_login_form():
+    if login_form_el: login_form_el.style.display = "block"
+    if main_ui_el: main_ui_el.style.display = "none"
+
+def show_main_ui():
+    if login_form_el: login_form_el.style.display = "none"
+    if main_ui_el: main_ui_el.style.display = "block"
+
+# --- Rendering Functions (Compacted) ---
+def render_media_compact(media_attachments):
+    if not media_attachments: return ""
+    media_html = '<div class="media-attachments">'
+    for media in media_attachments:
+        media_type = media.get('type') or 'unknown'
+        preview_url = safe_escape(media.get('preview_url'))
+        remote_url = safe_escape(media.get('remote_url') or media.get('url'), '#')
+        description = safe_escape(media.get('description'), f'{media_type} attachment')
+        if media_type in ['image', 'gifv'] and preview_url:
+            media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer"><img src="{preview_url}" alt="{description}" title="{description}" loading="lazy"></a>'
+        elif media_type == 'video' and preview_url:
+             media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer" title="{description} (Video)"><img src="{preview_url}" alt="{description}"></a>'
+        elif media_type == 'audio':
+              media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer" title="{description}"><span>&#127925;</span></a>'
+        else:
+            media_html += f'<a href="{remote_url}" target="_blank" rel="noopener noreferrer"><span>[{safe_escape(media_type)}]</span></a>'
+    media_html += '</div>'
+    return media_html
+
+def render_timeline_status(status_data):
+    """Renders compact HTML for a single status."""
+    if not status_data: return ""
+    is_reblog = status_data.get('reblog') is not None
+    status = status_data['reblog'] if is_reblog else status_data
+    account = status.get('account', {})
+    display_name = safe_escape(account.get('display_name'), 'Unknown User')
+    username = safe_escape(account.get('acct'))
+    avatar_url = safe_escape(account.get('avatar_static'))
+    post_content_html = status.get('content') or ''
+    post_url = safe_escape(status.get('url'), '#')
+    created_at_val = status.get('created_at')
+    formatted_date = 'Unknown date'
+    if created_at_val:
+        try:
+            temp_dt = None
+            if isinstance(created_at_val, datetime): temp_dt = created_at_val
+            elif isinstance(created_at_val, str): temp_dt = datetime.fromisoformat(created_at_val.replace('Z', '+00:00'))
+            if temp_dt: formatted_date = temp_dt.strftime('%Y-%m-%d %H:%M')
+            else: formatted_date = safe_escape(created_at_val)
+        except Exception as date_err:
+             print(f"Error formatting created_at date: {date_err}")
+             formatted_date = safe_escape(created_at_val)
+    boost_html = ""
+    if is_reblog:
+        reblogger_account = status_data.get('account', {})
+        reblogger_name = safe_escape(reblogger_account.get('display_name'), 'Unknown User')
+        reblogger_acct = safe_escape(reblogger_account.get('acct'))
+        boost_html = f'<div class="boosted-by">🔁 Boosted by {reblogger_name} (@{reblogger_acct})</div>'
+    media_html = render_media_compact(status.get('media_attachments', []))
+    post_html = f"""
+    <div class="mastodonpy-timeline-post">
+        {boost_html}
+        <div class="author-info">
+            <figure class="image is-32x32">
+                 <img src="{avatar_url}" alt="{display_name} avatar" loading="lazy" class="is-rounded">
+            </figure>
+            <div class="names" style="margin-left: 0.5em;">
+                 <p class="display-name">{display_name}</p>
+                 <p class="username">@{username}</p>
+            </div>
+        </div>
+        {media_html}
+        <div class="content post-content">{post_content_html}</div>
+        <div class="post-meta">
+            <a href="{post_url}" target="_blank" rel="noopener noreferrer">{formatted_date}</a>
+        </div>
+    </div>"""
+    return post_html
+
+# --- Authentication and Main Logic ---
+
+def fetch_and_render_timeline():
+    """Fetches timeline if API object is ready."""
+    global api, output_div_el
+    if not api:
+        display_message(login_messages_el, "Not authenticated.", is_error=True)
+        show_login_form() # Ensure login form shows if API is missing
+        return
+    if not output_div_el:
+         # Try to get it again, just in case it wasn't ready before
+         output_div_el = js.document.getElementById(OUTPUT_DIV_ID)
+         if not output_div_el:
+              display_message(login_messages_el, "Output element not found.", is_error=True)
+              return
+
+    output_div_el.innerHTML = "<p><i>Fetching timeline...</i></p>" # Loading indicator
+    try:
+        print(f"Fetching timeline for Account ID: {TARGET_ACCOUNT_ID}, Limit: {TIMELINE_LIMIT}")
+        timeline_data = api.account_statuses(TARGET_ACCOUNT_ID, limit=TIMELINE_LIMIT)
+        print(f"Timeline data received ({len(timeline_data)} posts).")
+
+        if timeline_data:
+            all_posts_html = "".join([render_timeline_status(status) for status in timeline_data])
+            output_div_el.innerHTML = all_posts_html
+            print("Timeline rendered successfully.")
+        else:
+             output_div_el.innerHTML = "<p>No posts found in the timeline.</p>"
+    except Exception as e:
+        display_message(login_messages_el, f"Error fetching timeline: {e}", is_error=True)
+        # Optionally show login form again if auth fails
+        # show_login_form()
+
+def do_login(evt):
+    """Handles the login button click."""
+    clear_message(login_messages_el)
+    url = inst_input_el.value.strip() if inst_input_el else None
+    if not url or not url.startswith("http"):
+        display_message(login_messages_el, "Please enter a valid instance URL (starting with http:// or https://).", is_error=True)
+        return
+
+    store(INSTANCE_URL_KEY, url)
+    # Clear old client creds when changing instance
+    remove(CLIENT_ID_KEY)
+    remove(CLIENT_SECRET_KEY)
+    client_id = None
+    client_secret = None
+
+    # Register app
+    display_message(login_messages_el, "Registering application...")
+    try:
+        app_info = Mastodon.create_app(
+            APP_NAME, scopes=SCOPES, redirect_uris=REDIRECT_URI, api_base_url=url
+        )
+        client_id = app_info[0]
+        client_secret = app_info[1]
+        store(CLIENT_ID_KEY, client_id)
+        store(CLIENT_SECRET_KEY, client_secret)
+        display_message(login_messages_el, "Application registered.")
+    except Exception as e:
+        display_message(login_messages_el, f"Error creating app: {e}", is_error=True)
+        return
+
+    # Redirect user for authorization
+    try:
+        tmp_api = Mastodon(client_id=client_id, client_secret=client_secret, api_base_url=url)
+        auth_url = tmp_api.auth_request_url(
+            client_id=client_id, redirect_uris=REDIRECT_URI, scopes=SCOPES
+        )
+        display_message(login_messages_el, "Redirecting to Mastodon for login...")
+        js.window.location.href = auth_url # Redirect browser
+    except Exception as e:
+        display_message(login_messages_el, f"Error generating auth URL: {e}", is_error=True)
+
+def do_logout(evt):
+    """Handles the logout button click."""
+    global api
+    api = None
+    remove(ACCESS_TOKEN_KEY)
+    remove(INSTANCE_URL_KEY)
+    # Optionally remove client creds too
+    # remove(CLIENT_ID_KEY)
+    # remove(CLIENT_SECRET_KEY)
+    clear_message(login_messages_el)
+    display_message(login_messages_el, "Logged out.")
+    show_login_form()
+
+
+# --- Initialization on Page Load ---
+try:
+    pyodide_http.patch_all()
+    print("Network requests patched.")
+
+    params = urllib.parse.urlparse(js.window.location.href)
+    query = urllib.parse.parse_qs(params.query)
+    oauth_code = query.get("code", [None])[0]
+
+    if oauth_code:
+        js.window.history.pushState("", "", params.path)
+
+    instance_url = load(INSTANCE_URL_KEY)
+    client_id = load(CLIENT_ID_KEY)
+    client_secret = load(CLIENT_SECRET_KEY)
+    access_token = load(ACCESS_TOKEN_KEY)
+
+    if oauth_code and instance_url and client_id and client_secret:
+        print("OAuth code detected, attempting to log in...")
+        display_message(login_messages_el, "Completing login...")
+        try:
+            tmp_api = Mastodon(client_id=client_id, client_secret=client_secret, api_base_url=instance_url)
+            token = tmp_api.log_in(code=oauth_code, redirect_uri=REDIRECT_URI, scopes=SCOPES)
+            store(ACCESS_TOKEN_KEY, token)
+            access_token = token
+            print("Access token obtained and stored.")
+            api = Mastodon(access_token=access_token, api_base_url=instance_url)
+            show_main_ui()
+            fetch_and_render_timeline()
+        except Exception as e:
+            display_message(login_messages_el, f"Error completing login: {e}", is_error=True)
+            show_login_form()
+
+    elif access_token and instance_url:
+        print("Access token found, initializing API.")
+        try:
+            api = Mastodon(access_token=access_token, api_base_url=instance_url)
+            show_main_ui()
+            fetch_and_render_timeline()
+        except Exception as e:
+             display_message(login_messages_el, f"Error initializing API with token: {e}. Please log in again.", is_error=True)
+             remove(ACCESS_TOKEN_KEY)
+             show_login_form()
+    else:
+        print("No access token found, showing login form.")
+        show_login_form()
+        if inst_input_el and instance_url:
+            inst_input_el.value = instance_url
+
+    # Attach button listeners
+    if login_button_el:
+        login_button_el.addEventListener("click", create_proxy(do_login))
+    if logout_button_el:
+        logout_button_el.addEventListener("click", create_proxy(do_logout))
+
+except Exception as e:
+    display_message(login_messages_el, f"Initialization error: {e}", is_error=True)
+    show_login_form()
+
+    </script>
+
+
+    <script>
+      (function () {
+        // Use class selector for theme buttons
+        const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+        const htmlElement = document.documentElement;
+        const storageKey = 'theme-preference';
+
+        const applyTheme = (theme) => {
+          htmlElement.dataset.theme = theme;
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // Function to handle toggle click
+        const handleToggleClick = () => {
+          let currentTheme = htmlElement.dataset.theme;
+          let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(newTheme);
+          localStorage.setItem(storageKey, newTheme);
+        }
+
+        // Apply initial theme
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme);
+
+        // Add listeners to all toggle buttons found
+        if (toggleButtons.length > 0) {
+          toggleButtons.forEach(button => {
+            button.addEventListener('click', handleToggleClick);
+          });
+        } else {
+          console.warn("Theme toggle button(s) not found");
+        }
+      })();
+    </script>
+
+  </body>
+
+</html>

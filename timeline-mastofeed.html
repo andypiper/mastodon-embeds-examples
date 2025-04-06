@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mastodon Timeline Embed (Mastofeed Example)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed timeline, fediverse, example, mastofeed, iframe" />
+    <meta name="description"
+      content="Example showing how to embed a Mastodon timeline using the Mastofeed service via an iframe, with synced dark mode." />
+
+    <meta property="og:title" content="Mastodon Timeline Embed Example (Mastofeed)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/mastofeed-timeline.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to embed a Mastodon timeline using the Mastofeed service via an iframe, with synced dark mode." />
+    <meta property="og:site_name" content="Fediverse Embed Examples" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .theme-toggle-button {
+        margin-bottom: 1.5rem;
+      }
+
+      /* Style the iframe */
+      .mastofeed-iframe {
+        width: 80%;
+        /* Set width */
+        min-height: 600px;
+        /* Set a minimum height */
+        border: none;
+        /* Remove default iframe border */
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section">
+      <div class="container">
+
+        <button id="theme-toggle" class="button theme-toggle-button">Toggle Theme</button>
+
+        <h1 class="title">Mastodon Timeline Embed: Mastofeed</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About Mastofeed</h2>
+            <p>
+              <a href="https://mastofeed.com/" target="_blank" rel="noopener noreferrer">Mastofeed</a> is a third-party
+              service that generates an embeddable timeline for a Mastodon user profile via an
+              <code>&lt;iframe&gt;</code>.
+            </p>
+            <p>
+              Configuration is done via URL parameters in the iframe's <code>src</code>. This example also syncs the
+              Mastofeed theme (light/dark) with the page theme toggle.
+            </p>
+            <ul>
+              <li><code>userurl</code>: The URL of the Mastodon user profile.</li>
+              <li><code>theme</code>: Set dynamically by the theme toggle (<code>light</code> or <code>dark</code>).
+              </li>
+              <li><code>header</code>, <code>replies</code>, <code>boosts</code>, <code>size</code>: Other display
+                options.</li>
+            </ul>
+            <p>
+              <strong>Note:</strong> Toggling the theme will cause the iframe below to reload. Line spacing issues may
+              be inherent to the Mastofeed service's internal styling.
+            </p>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Timeline</h2>
+            <p>This is what the embedded timeline looks like using the Mastofeed iframe:</p>
+
+            <iframe id="mastofeed-iframe" class="mastofeed-iframe" allowfullscreen
+              sandbox="allow-top-navigation allow-scripts"
+              src="https://www.mastofeed.com/apiv2/feed?userurl=https%3A%2F%2Fmacaw.social%2Fusers%2Fandypiper&theme=light&size=20&header=true&replies=false&boosts=true"
+              title="Mastodon Timeline via Mastofeed"></iframe>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        const mastofeedIframe = document.getElementById('mastofeed-iframe'); // Get iframe
+        const storageKey = 'theme-preference';
+
+        // Base URL parts for the iframe (modify userurl etc. as needed)
+        const mastofeedBase = 'https://www.mastofeed.com/apiv2/feed';
+        const mastofeedParams = {
+          userurl: 'https://macaw.social/users/andypiper', // Needs encoding
+          size: '20',
+          header: 'true',
+          replies: 'false',
+          boosts: 'true'
+          // theme will be added dynamically
+        };
+
+        // Function to construct the full Mastofeed URL
+        const buildMastofeedUrl = (theme) => {
+          const encodedUserUrl = encodeURIComponent(mastofeedParams.userurl);
+          // Construct query parameters, adding the dynamic theme
+          const queryParams = `userurl=${encodedUserUrl}&theme=${theme}&size=${mastofeedParams.size}&header=${mastofeedParams.header}&replies=${mastofeedParams.replies}&boosts=${mastofeedParams.boosts}`;
+          return `${mastofeedBase}?${queryParams}`;
+        };
+
+        // Function to apply the theme to the page and update the iframe
+        const applyTheme = (theme) => {
+          // Apply theme to the main page
+          htmlElement.dataset.theme = theme;
+
+          // Update the iframe src if the iframe exists
+          if (mastofeedIframe) {
+            const newSrc = buildMastofeedUrl(theme);
+            // Only update src if it's different, to avoid unnecessary reloads on initial load
+            // unless the iframe hasn't loaded its initial content yet
+            if (!mastofeedIframe.src || mastofeedIframe.src !== newSrc) {
+              console.log(`Updating iframe theme to: ${theme}`); // For debugging
+              mastofeedIframe.src = newSrc;
+            }
+          } else {
+            console.warn("Mastofeed iframe not found");
+          }
+        };
+
+        // Function to get the preferred theme (localStorage > system > default)
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        // --- Initialization ---
+        let currentTheme = getPreferredTheme();
+        // Apply the initial theme (this will also set the initial iframe src correctly)
+        applyTheme(currentTheme);
+
+        // --- Event Listener ---
+        if (toggleButton) {
+          toggleButton.addEventListener('click', () => {
+            // Determine the new theme
+            currentTheme = htmlElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            // Apply the new theme (this updates page and iframe src)
+            applyTheme(currentTheme);
+            // Save the preference
+            localStorage.setItem(storageKey, currentTheme);
+          });
+        } else {
+          console.warn("Theme toggle button not found");
+        }
+      })();
+    </script>
+
+  </body>
+
+</html>
