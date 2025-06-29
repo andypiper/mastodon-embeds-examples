@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mastodon Timeline Embed (Mastofeed Example)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed timeline, fediverse, example, mastofeed, iframe" />
+    <meta name="description"
+      content="Example showing how to embed a Mastodon timeline using the Mastofeed service via an iframe, with synced dark mode." />
+
+    <meta property="og:title" content="Mastodon Timeline Embed Example (Mastofeed)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/mastofeed-timeline.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to embed a Mastodon timeline using the Mastofeed service via an iframe, with synced dark mode." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
+      }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
+
+      /* Style the iframe */
+      .mastofeed-iframe {
+        width: 80%;
+        /* Set width */
+        min-height: 600px;
+        /* Set a minimum height */
+        border: none;
+        /* Remove default iframe border */
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section has-top-controls">
+
+      <button class="button theme-toggle-button" aria-label="Toggle theme">
+        <span class="icon theme-icon">
+        </span>
+      </button>
+
+      <div class="container">
+
+        <h1 class="title">Mastodon Timeline Embed: Mastofeed</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About Mastofeed</h2>
+            <p>
+              <a href="https://mastofeed.com/" target="_blank" rel="noopener noreferrer">Mastofeed</a> is a third-party
+              service that generates an embeddable timeline for a Mastodon user profile via an
+              <code>&lt;iframe&gt;</code>.
+            </p>
+            <p>
+              Configuration is done via URL parameters in the iframe's <code>src</code>. This example also syncs the
+              Mastofeed theme (light/dark) with the page theme toggle.
+            </p>
+            <ul>
+              <li><code>userurl</code>: The URL of the Mastodon user profile.</li>
+              <li><code>theme</code>: Set dynamically by the theme toggle (<code>light</code> or <code>dark</code>).
+              </li>
+              <li><code>header</code>, <code>replies</code>, <code>boosts</code>, <code>size</code>: Other display
+                options.</li>
+            </ul>
+            <p>
+              <strong>Note:</strong> Toggling the theme will cause the iframe below to reload. Line spacing issues may
+              be inherent to the Mastofeed service's internal styling.
+            </p>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Timeline</h2>
+            <p>This is what the embedded timeline looks like using the Mastofeed iframe:</p>
+
+            <iframe id="mastofeed-iframe" class="mastofeed-iframe" allowfullscreen
+              sandbox="allow-top-navigation allow-scripts"
+              src="https://www.mastofeed.com/apiv2/feed?userurl=https%3A%2F%2Fmacaw.social%2Fusers%2Fandypiper&theme=light&size=20&header=true&replies=false&boosts=true"
+              title="Mastodon Timeline via Mastofeed"></iframe>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        // --- Elements ---
+        const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+        const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+        const htmlElement = document.documentElement;
+        const mastofeedIframe = document.getElementById('mastofeed-iframe'); // Get iframe
+
+        // --- Constants ---
+        const storageKey = 'theme-preference';
+        const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+        const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+        // --- Iframe Config ---
+        const mastofeedBase = 'https://www.mastofeed.com/apiv2/feed';
+        const mastofeedParams = {
+          userurl: 'https://macaw.social/users/andypiper', // Needs encoding
+          size: '20',
+          header: 'true',
+          replies: 'false',
+          boosts: 'true'
+          // theme will be added dynamically
+        };
+
+        // --- Functions ---
+        const buildMastofeedUrl = (theme) => {
+          const encodedUserUrl = encodeURIComponent(mastofeedParams.userurl);
+          const queryParams = `userurl=${encodedUserUrl}&theme=${theme}&size=${mastofeedParams.size}&header=${mastofeedParams.header}&replies=${mastofeedParams.replies}&boosts=${mastofeedParams.boosts}`;
+          return `${mastofeedBase}?${queryParams}`;
+        };
+
+        const applyTheme = (theme) => {
+          // Apply theme to the main page
+          htmlElement.dataset.theme = theme;
+
+          // Update icons
+          const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+          iconSpans.forEach(span => {
+            if (span) span.innerHTML = iconHTML;
+          });
+
+          // Update the iframe src if the iframe exists
+          if (mastofeedIframe) {
+            const newSrc = buildMastofeedUrl(theme);
+            // Only update src if it's different or not set yet
+            if (!mastofeedIframe.src || mastofeedIframe.getAttribute('src') !== newSrc) {
+              console.log(`Updating iframe theme to: ${theme}`);
+              mastofeedIframe.setAttribute('src', newSrc); // Use setAttribute for clarity
+            }
+          } else {
+            // Only warn if we expected the iframe (might not be present on all pages)
+            // console.warn("Mastofeed iframe not found on this page.");
+          }
+        };
+
+        const getPreferredTheme = () => {
+          const savedTheme = localStorage.getItem(storageKey);
+          if (savedTheme) return savedTheme;
+          return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+
+        const handleToggleClick = () => {
+          let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+          let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(newTheme);
+          localStorage.setItem(storageKey, newTheme);
+        }
+
+        // --- Initialization ---
+        let currentTheme = getPreferredTheme();
+        applyTheme(currentTheme); // Apply initial theme and set initial iframe src
+
+        // Add listeners to all toggle buttons found
+        if (toggleButtons.length > 0) {
+          toggleButtons.forEach(button => {
+            button.addEventListener('click', handleToggleClick);
+          });
+        } else {
+          // console.warn("Theme toggle button(s) not found");
+        }
+      })();
+    </script>
+
+  </body>
+
+</html>

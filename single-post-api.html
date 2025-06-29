@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Single Post API Data Example</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, api, json, fediverse, example, status" />
+    <meta name="description"
+      content="Example showing how to fetch raw JSON data for a single Mastodon post using the API." />
+
+    <meta property="og:title" content="Mastodon Single Post API Data Example" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/single-post-api.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to fetch raw JSON data for a single Mastodon post using the API." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
+      }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
+
+      /* Style for the JSON output area */
+      #api-response {
+        white-space: pre-wrap;
+        /* Wrap long lines in the JSON */
+        word-break: break-all;
+        /* Break long strings if needed */
+        max-height: 600px;
+        /* Limit height and add scroll */
+        overflow-y: auto;
+        font-size: 0.85em;
+        /* Slightly smaller font for JSON */
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section has-top-controls">
+
+        <button class="button theme-toggle-button" aria-label="Toggle theme">
+          <span class="icon theme-icon">
+          </span>
+        </button>
+
+      <div class="container">
+
+        <h1 class="title">Mastodon API: Fetching Single Post Data</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About This Method</h2>
+            <p>
+              Instead of embedding a pre-formatted post, you can fetch the raw data for a specific status directly from
+              the Mastodon API's <code>/api/v1/statuses/:id</code> endpoint. This gives you complete control over how
+              you display the information.
+            </p>
+            <p>
+              This example uses the browser's <code>fetch()</code> API in JavaScript to retrieve the data for post
+              <code>109349688112355529</code> from <code>macaw.social</code> and displays the raw JSON response below.
+            </p>
+            <p>
+              You could try the API endpoint directly using a tool like <code>curl</code>:
+            </p>
+            <code>curl https://macaw.social/api/v1/statuses/109349688112355529</code>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Raw API Response (JSON)</h2>
+            <p>The following is the raw JSON data returned by the API for the specified post:</p>
+
+            <pre><code id="api-response">Loading API data...</code></pre>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+<script>
+  (function () {
+    // Simple inline SVGs for icons
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+    // Select ALL buttons with this class
+    const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+    // Select ALL icon spans within those buttons
+    const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+    const htmlElement = document.documentElement;
+    const storageKey = 'theme-preference';
+
+    // Function to apply theme and update ALL icons
+    const applyTheme = (theme) => {
+      htmlElement.dataset.theme = theme;
+      const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+      iconSpans.forEach(span => {
+        // Check if span exists before setting innerHTML
+        if (span) span.innerHTML = iconHTML;
+      });
+    };
+
+    // Function to get the preferred theme
+    const getPreferredTheme = () => {
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) return savedTheme;
+      // Default to light if no system preference detected or needed
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // Function to handle the button click
+    const handleToggleClick = () => {
+      // Read the current theme directly from the html element
+      let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem(storageKey, newTheme);
+    }
+
+    // --- Initialization ---
+    // Apply the initial theme when the script runs
+    let currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    // Add listeners to all toggle buttons found
+    if (toggleButtons.length > 0) {
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', handleToggleClick);
+      });
+    } else {
+      // It's okay if not found on pages without the button
+      // console.warn("Theme toggle button(s) not found on this page.");
+    }
+  })();
+</script>
+
+    <script>
+      // Define the API endpoint URL
+      // Using post ID 109349688112355529 from macaw.social
+      const apiUrl = "https://macaw.social/api/v1/statuses/109349688112355529";
+
+      // Get the element where the response will be displayed
+      const outputElement = document.getElementById("api-response");
+
+      // Use fetch to get data from the API
+      fetch(apiUrl)
+        .then(response => {
+          // Check if the request was successful
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          // Parse the JSON response
+          return response.json();
+        })
+        .then(data => {
+          // Format the JSON data for display (pretty print)
+          const formattedJson = JSON.stringify(data, null, 2); // Indent with 2 spaces
+          // Display the formatted JSON in the output element
+          if (outputElement) {
+            outputElement.textContent = formattedJson;
+          }
+        })
+        .catch(error => {
+          // Handle any errors during the fetch operation
+          console.error("Error fetching Mastodon status:", error);
+          if (outputElement) {
+            outputElement.textContent = `Error loading data: ${error.message}`;
+          }
+        });
+    </script>
+
+  </body>
+
+</html>

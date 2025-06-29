@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mastodon Timeline Embed (Emfed Example)</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed timeline, fediverse, example, javascript, emfed" />
+    <meta name="description"
+      content="Example showing how to embed a Mastodon timeline using the Emfed JavaScript library." />
+
+    <meta property="og:title" content="Mastodon Timeline Embed Example (Emfed)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/mfed-timeline.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description"
+      content="Example showing how to embed a Mastodon timeline using the Emfed JavaScript library." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="https://esm.sh/emfed@1/toots.css">
+
+    <style>
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
+      }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
+
+      /* Add theme overrides for emfed-toots.css if necessary */
+      /* Example: */
+      /*
+      [data-theme="dark"] .toot {
+         background-color: #333;
+         border-color: #555;
+         color: #eee;
+      }
+      [data-theme="dark"] .toot a {
+         color: #8ab4f8;
+      }
+      */
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section has-top-controls">
+        <button class="button theme-toggle-button" aria-label="Toggle theme">
+            <span class="icon theme-icon">
+                </span>
+        </button>
+
+      <div class="container">
+
+        <h1 class="title">Mastodon Timeline Embed: Emfed</h1>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">About This Method</h2>
+            <p>
+              This method uses the <a href="https://github.com/sampsyo/emfed" target="_blank"
+                rel="noopener noreferrer">Emfed</a> JavaScript library.
+              It fetches timeline data directly from the Mastodon API and renders it client-side, replacing a specific
+              anchor (<code>&lt;a&gt;</code>) tag on the page.
+            </p>
+            <p>
+              Configuration is done using <code>data-*</code> attributes directly on the anchor tag. Key attributes
+              include:
+            </p>
+            <ul>
+              <li><code>href</code>: The URL of the Mastodon user profile (e.g.,
+                <code>https://instance.social/@username</code>).
+              </li>
+              <li><code>class="mastodon-feed"</code>: Required class for Emfed to find the element.</li>
+              <li><code>data-toot-limit</code>: Maximum number of posts to display.</li>
+              <li><code>data-toot-account-id</code>: The numerical Account ID for the user. <strong>Required for
+                  fetching posts.</strong></li>
+              <li><code>data-exclude-reblogs</code>: Set to "true" to hide boosts/reblogs (optional).</li>
+            </ul>
+            <p>
+              <strong>Important:</strong> You need the Mastodon <strong>Account ID</strong> (a number, not the username)
+              for the account you want to embed. You can often find this using API tools (like searching the account via
+              <code>/.well-known/webfinger</code> on the instance and looking for the ID in the <code>self</code> link)
+              or sometimes by viewing the source code of the user's profile page.
+            </p>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Rendered Timeline</h2>
+            <p>Emfed will replace the anchor tag below with the rendered timeline:</p>
+
+            <div> <a class="mastodon-feed" href="https://macaw.social/@andypiper" data-toot-limit="10"
+                data-toot-account-id="109332977621728450" /* <<< Replace with desired Account ID */
+                data-exclude-reblogs="false" /* Set to "true" to hide boosts * />
+              Loading posts by @andypiper@macaw.social...
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+<script>
+  (function () {
+    // Simple inline SVGs for icons
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+    // Select ALL buttons with this class
+    const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+    // Select ALL icon spans within those buttons
+    const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+    const htmlElement = document.documentElement;
+    const storageKey = 'theme-preference';
+
+    // Function to apply theme and update ALL icons
+    const applyTheme = (theme) => {
+      htmlElement.dataset.theme = theme;
+      const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+      iconSpans.forEach(span => {
+        // Check if span exists before setting innerHTML
+        if (span) span.innerHTML = iconHTML;
+      });
+    };
+
+    // Function to get the preferred theme
+    const getPreferredTheme = () => {
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) return savedTheme;
+      // Default to light if no system preference detected or needed
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // Function to handle the button click
+    const handleToggleClick = () => {
+      // Read the current theme directly from the html element
+      let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem(storageKey, newTheme);
+    }
+
+    // --- Initialization ---
+    // Apply the initial theme when the script runs
+    let currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    // Add listeners to all toggle buttons found
+    if (toggleButtons.length > 0) {
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', handleToggleClick);
+      });
+    } else {
+      // It's okay if not found on pages without the button
+      // console.warn("Theme toggle button(s) not found on this page.");
+    }
+  })();
+</script>
+
+
+    <script type="module" src="https://esm.sh/emfed"></script>
+
+  </body>
+
+</html>

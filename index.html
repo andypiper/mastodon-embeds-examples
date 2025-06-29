@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Mastodon Embed Examples</title>
+
+    <meta name="author" content="@andypiper@macaw.social" />
+    <meta name="keywords" content="mastodon, embed, timeline, examples, javascript, pyscript, python" />
+    <meta name="description" content="Examples of embedding Mastodon posts and timelines." />
+
+    <meta property="og:title" content="Mastodon Embed Examples" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mastodon-embeds.glitch.me/index.html" />
+    <meta property="og:image" content="https://mastodon-embeds.glitch.me/mastodon-logo.svg" />
+    <meta property="og:description" content="Examples of embedding Mastodon posts and timelines." />
+    <meta property="og:site_name" content="Mastodon Embed Examples" />
+
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" />
+
+    <style>
+      .section.has-top-controls {
+          position: relative;
+          padding-top: 4rem;
+      }
+      .theme-toggle-button {
+         position: absolute;
+         top: 1.5rem;
+         right: 1.5rem;
+         width: 2.5rem;
+         height: 2.5rem;
+         padding: 0;
+         border-radius: 50%;
+         display: inline-flex;
+         align-items: center;
+         justify-content: center;
+      }
+      .theme-toggle-button .icon svg {
+           width: 1.1em;
+           height: 1.1em;
+       }
+
+      .logo-figure {
+        margin: 0;
+      }
+
+       .columns.is-equal-height > .column {
+          display: flex;
+          flex-direction: column;
+      }
+      .columns.is-equal-height > .column > .box {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+      }
+       .columns.is-equal-height > .column > .box > .content {
+           flex-grow: 1;
+       }
+    </style>
+
+  </head>
+
+  <body>
+
+    <section class="section has-top-controls">
+        <button class="button theme-toggle-button" aria-label="Toggle theme">
+          <span class="icon theme-icon">
+          </span>
+        </button>
+      <div class="container">
+
+        <div class="columns is-vcentered mb-5">
+          <div class="column is-narrow">
+            <figure class="image is-64x64 logo-figure">
+              <img src="./mastodon-logo.svg" alt="Mastodon Logo">
+            </figure>
+          </div>
+          <div class="column">
+            <h1 class="title">Mastodon Embed Examples</h1>
+            <p class="subtitle">Testing various ways to embed Mastodon content.</p>
+          </div>
+        </div>
+
+
+        <div class="box">
+          <div class="content">
+            <h2 class="title is-4">Introduction</h2>
+            <p>
+              This is a simple project for testing embeds of content from Mastodon using different tools and methods.
+              The goal is to provide clear, isolated examples.
+            </p>
+            <p>
+              📝 Read more background on DEV: <a href="https://dev.to/andypiper/a-opportunity-for-developers-1ee4"
+                target="_blank" rel="noopener noreferrer">The Fediverse is an Opportunity for Developers</a>.
+            </p>
+          </div>
+        </div>
+
+        <div class="columns is-equal-height">
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Mastodon Post Embeds</h3>
+                <p>Embedding single posts is straightforward using Mastodon's API (it supports
+                <a href="https://docs.joinmastodon.org/methods/oembed/">oEmbed</a>, and
+                there is an option to get embed code on the default web UI).</p>
+                <ul>
+                  <li><a href="./single-post-oembed.html">Single Post (Standard Embed/oEmbed)</a> - Uses the common
+                    blockquote embed.</li>
+                  <li><a href="./single-post-api.html">Single Post (API Data)</a> - Fetches raw JSON data via
+                    JavaScript.</li>
+                  <li><a href="./single-post-pyscript.html">Single Post (PyScript + oEmbed)</a> - Fetches oEmbed data
+                    via PyScript.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Mastodon Timeline Embeds</h3>
+                <p>Embedding timelines requires external services or client-side libraries, as Mastodon doesn't offer a
+                  built-in timeline embed.</p>
+                <ul>
+                  <li><a href="./timeline-basic-rss.html">Timeline via RSS feed</a> - Uses an RSS feed to display content (limitations apply).</li>
+                  <li><a href="./timeline-emfed.html">Timeline via Emfed (JS)</a> - Uses the Emfed library.</li>
+                  <li><a href="./timeline-mastofeed.html">Timeline via Mastofeed (iframe)</a> - Uses the Mastofeed
+                    service.</li>
+                  <li><a href="./timeline-meft.html">Timeline via MEFT (JS)</a> - Uses the mastodon-embed-feed-timeline
+                    library.</li>
+                  <li><a href="./timeline-pyscript.html">Timeline via PyScript + Mastodon.py</a> - Uses
+                    PyScript & Mastodon.py (requires authentication).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="columns is-equal-height">
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Other Notes</h3>
+                <p>Some examples include a <a href="https://github.com/Uden-AI/fediverse-share" target="_blank"
+                    rel="noopener noreferrer">Fediverse sharing button</a>.</p>
+                <p>The code for these examples is available on <a
+                    href="https://github.com/andypiper/mastodon-embeds-examples" target="_blank"
+                    rel="noopener noreferrer">GitHub</a>.</p>
+                <p>You can remix this project on Glitch:</p>
+                <a href="https://glitch.com/edit/#!/remix/mastodon-embeds"><img
+                    src="https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button-v2.svg"
+                    alt="Remix on Glitch" style="height: 33px;"></a>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="box">
+              <div class="content">
+                <h3 class="title is-5">Find Me on the Fediverse</h3>
+                <p>Say hello 👋🏻:</p>
+                <ul>
+                  <li>📝 <a href="https://macaw.social/@andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@macaw.social</a></li>
+                  <li>📽️ <a href="https://makertube.net/a/andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@makertube.net</a></li>
+                  <li>📷 <a href="https://pixelfed.social/@andypiper" target="_blank"
+                      rel="noopener noreferrer">@andypiper@pixelfed.social</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong><a href="https://mastodon-embeds.glitch.me">Mastodon Embed Examples</a></strong>.
+          Styled using <a href="https://bulma.io/" target="_blank" rel="noopener noreferrer">Bulma</a>.
+          Find me on Mastodon: <a href="https://macaw.social/@andypiper" target="_blank"
+            rel="noopener noreferrer">@andypiper@macaw.social</a>.
+        </p>
+      </div>
+    </footer>
+
+<script>
+  (function () {
+    // Simple inline SVGs for icons
+    const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+    const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+
+    // Select ALL buttons with this class
+    const toggleButtons = document.querySelectorAll('.theme-toggle-button');
+    // Select ALL icon spans within those buttons
+    const iconSpans = document.querySelectorAll('.theme-toggle-button .theme-icon');
+    const htmlElement = document.documentElement;
+    const storageKey = 'theme-preference';
+
+    // Function to apply theme and update ALL icons
+    const applyTheme = (theme) => {
+      htmlElement.dataset.theme = theme;
+      const iconHTML = theme === 'dark' ? moonIcon : sunIcon;
+      iconSpans.forEach(span => {
+        // Check if span exists before setting innerHTML
+        if (span) span.innerHTML = iconHTML;
+      });
+    };
+
+    // Function to get the preferred theme
+    const getPreferredTheme = () => {
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme) return savedTheme;
+      // Default to light if no system preference detected or needed
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // Function to handle the button click
+    const handleToggleClick = () => {
+      // Read the current theme directly from the html element
+      let currentTheme = htmlElement.dataset.theme || getPreferredTheme();
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem(storageKey, newTheme);
+    }
+
+    // --- Initialization ---
+    // Apply the initial theme when the script runs
+    let currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    // Add listeners to all toggle buttons found
+    if (toggleButtons.length > 0) {
+      toggleButtons.forEach(button => {
+        button.addEventListener('click', handleToggleClick);
+      });
+    } else {
+      // It's okay if not found on pages without the button
+      // console.warn("Theme toggle button(s) not found on this page.");
+    }
+  })();
+</script>
+
+  </body>
+
+</html>
+

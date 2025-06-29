@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Mastodon.py Single Post Display</title>
+    <meta name="author" content="Your Name">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="mastodon, pyscript, mastodon.py, embed">
+    <meta name="description" content="Displaying a single Mastodon post using Mastodon.py in the browser via PyScript">
+
+    <!-- Load PyScript -->
+    <script type="module" src="https://pyscript.net/releases/2024.4.1/core.js"></script>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.4.1/core.css">
+
+    <style>
+      body {
+        background-color: #f0f0f5;
+        color: #333;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 1em;
+      }
+
+      h1 {
+        color: #3a5da8;
+        margin-bottom: 1em;
+      }
+
+      .container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 2em;
+        margin-bottom: 2em;
+      }
+
+      #loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2em;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 5px solid #ccc;
+        border-top-color: #3a5da8;
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .post {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .post-header {
+        display: flex;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+
+      .user-info {
+        flex-grow: 1;
+      }
+
+      .display-name {
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .username {
+        color: #666;
+        margin: 0;
+      }
+
+      .post-content {
+        padding: 15px;
+      }
+
+      .post-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+
+      .post-media {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+      }
+
+      .media-attachment {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 4px;
+      }
+
+      .post-footer {
+        padding: 10px 15px;
+        color: #666;
+        border-top: 1px solid #eee;
+        font-size: 0.9em;
+      }
+
+      .error-message {
+        color: #d32f2f;
+        background-color: #ffebee;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+
+      .debug-info {
+        font-family: monospace;
+        font-size: 12px;
+        background-color: #f8f8f8;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin-top: 15px;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #3a5da8;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #2c4a8a;
+      }
+
+      .attribution {
+        font-size: 0.8em;
+        color: #777;
+        text-align: center;
+        margin-top: 2em;
+      }
+
+      /* Dark mode support */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #121212;
+          color: #e0e0e0;
+        }
+
+        .container,
+        .post {
+          background-color: #1e1e1e;
+          border-color: #333;
+        }
+
+        .post-header {
+          border-bottom-color: #333;
+        }
+
+        .username {
+          color: #aaa;
+        }
+
+        .post-footer {
+          color: #aaa;
+          border-top-color: #333;
+        }
+
+        h1 {
+          color: #81a4e3;
+        }
+
+        input[type="text"] {
+          background-color: #333;
+          border-color: #444;
+          color: #e0e0e0;
+        }
+
+        .error-message {
+          background-color: #321617;
+          color: #f48e8e;
+        }
+
+        .debug-info {
+          background-color: #2a2a2a;
+          border-color: #444;
+          color: #ddd;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Mastodon.py Post Viewer</h1>
+
+      <div class="input-group">
+        <label for="instance-url">Mastodon Instance URL:</label>
+        <input type="text" id="instance-url" value="https://mastodon.social" placeholder="https://mastodon.social">
+      </div>
+
+      <div class="input-group">
+        <label for="post-id">Post ID:</label>
+        <input type="text" id="post-id" value="108237453365199182" placeholder="Enter a post ID">
+      </div>
+
+      <button id="fetch-button">Fetch Post</button>
+
+      <div id="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="error-container"></div>
+      <div id="post-container"></div>
+    </div>
+
+    <div class="attribution">
+      Powered by <a href="https://pyscript.net/" target="_blank">PyScript</a> and
+      <a href="https://mastodonpy.readthedocs.io/" target="_blank">Mastodon.py</a>
+    </div>
+
+    <py-config>
+      packages = ["pyodide-http", "Mastodon.py"]
+    </py-config>
+
+    <script type="py">
+import pyodide_http
+pyodide_http.patch_all()
+
+from pyodide.ffi import create_proxy
+from pyscript import window, document
+from mastodon import Mastodon
+import html
+import json
+import datetime
+import traceback
+
+# Get DOM elements
+instance_input = document.getElementById("instance-url")
+post_id_input = document.getElementById("post-id")
+fetch_button = document.getElementById("fetch-button")
+loading_div = document.getElementById("loading")
+error_container = document.getElementById("error-container")
+post_container = document.getElementById("post-container")
+
+def format_date(date_str):
+    """Format ISO timestamp into a human-readable date."""
+    try:
+        date = datetime.datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        return date.strftime("%B %d, %Y · %I:%M %p")
+    except Exception as e:
+        return date_str  # Return the original string if parsing fails
+
+def display_error(message, debug_info=None):
+    """Display an error message."""
+    debug_html = ""
+    if debug_info:
+        debug_html = f'<div class="debug-info">{html.escape(debug_info)}</div>'
+
+    error_container.innerHTML = f'<div class="error-message">{message}{debug_html}</div>'
+    loading_div.style.display = "none"
+
+def display_post(status):
+    """Display a post with rich formatting."""
+    try:
+        # Determine if this is a boost
+        if status.get("reblog"):
+            original_post = status["reblog"]
+            boosted_by = status["account"]
+            boost_html = f'''
+            <div style="padding: 10px 15px; color: #777; font-size: 0.9em;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
+                Boosted by <strong>{html.escape(boosted_by["display_name"])}</strong>
+            </div>
+            '''
+        else:
+            original_post = status
+            boost_html = ""
+
+        # Handle media attachments
+        media_html = ""
+        if original_post.get("media_attachments") and len(original_post["media_attachments"]) > 0:
+            media_html = '<div class="post-media">'
+            for media in original_post["media_attachments"]:
+                if media["type"] in ["image", "gifv"]:
+                    media_html += f'<img class="media-attachment" src="{media["preview_url"]}" alt="{media.get("description", "")}" />'
+            media_html += '</div>'
+
+        # Build the HTML for the post
+        post_html = f'''
+        <div class="post">
+            {boost_html}
+            <div class="post-header">
+                <img class="avatar" src="{original_post["account"]["avatar"]}" alt="Avatar">
+                <div class="user-info">
+                    <p class="display-name">{html.escape(original_post["account"]["display_name"])}</p>
+                    <p class="username">@{original_post["account"]["acct"]}</p>
+                </div>
+            </div>
+            <div class="post-content">
+                {original_post["content"]}
+                {media_html}
+            </div>
+            <div class="post-footer">
+                {format_date(original_post["created_at"])}
+                · {original_post.get("favourites_count", 0)} 🌟
+                · {original_post.get("reblogs_count", 0)} 🔄
+            </div>
+        </div>
+        '''
+
+        post_container.innerHTML = post_html
+    except Exception as e:
+        error_details = traceback.format_exc()
+        print(f"Error rendering post: {str(e)}")
+        print(error_details)
+        display_error(f"Error rendering post: {str(e)}", error_details)
+    finally:
+        loading_div.style.display = "none"
+
+def fetch_post(event):
+    """Fetch and display a Mastodon post."""
+    # Clear previous content
+    error_container.innerHTML = ""
+    post_container.innerHTML = ""
+    loading_div.style.display = "flex"
+
+    # Get input values
+    instance_url = instance_input.value.strip()
+    post_id = post_id_input.value.strip()
+
+    # Validate inputs
+    if not instance_url or not post_id:
+        display_error("Please provide both an instance URL and a post ID.")
+        return
+
+    # Sanitize instance URL
+    if not instance_url.startswith("http"):
+        instance_url = "https://" + instance_url
+    # Remove trailing slash if present
+    if instance_url.endswith("/"):
+        instance_url = instance_url[:-1]
+
+    try:
+        print(f"Initializing Mastodon API with base URL: {instance_url}")
+        # Initialize Mastodon API (without authentication for public posts)
+        api = Mastodon(api_base_url=instance_url)
+
+        try:
+            # Use the correct public API method from Mastodon.py
+            print(f"Fetching post with ID: {post_id}")
+            status = api.status(post_id)
+            print("Successfully fetched post data")
+
+            # Display the post
+            display_post(status)
+        except Exception as specific_error:
+            error_details = traceback.format_exc()
+            print(f"Error in API request: {str(specific_error)}")
+            print(error_details)
+            display_error(f"Error fetching post: {str(specific_error)}", error_details)
+    except Exception as e:
+        error_details = traceback.format_exc()
+        print(f"Error initializing Mastodon API: {str(e)}")
+        print(error_details)
+        display_error(f"Error initializing Mastodon API: {str(e)}", error_details)
+
+# Attach event listener to the fetch button
+fetch_button.addEventListener("click", create_proxy(fetch_post))
+
+# Initialize with default values if provided
+if instance_input.value and post_id_input.value:
+    fetch_post(None)
+</script>
+  </body>
+
+</html>
